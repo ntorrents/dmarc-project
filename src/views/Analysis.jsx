@@ -3,7 +3,7 @@ function Analysis() {
         <section id="analysis" className="analysis">
             <div className="container">
                 <h2>Análisis Gratuito</h2>
-                <p>
+                <p className="align-center">
                     Introduce tu dominio y obtén un informe inicial sobre su
                     configuración actual.
                 </p>

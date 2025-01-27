@@ -3,7 +3,7 @@ function Contact() {
         <section id="contact" className="contact">
             <div className="container">
                 <h2>Contacto</h2>
-                <p>
+                <p className="align-center">
                     ¿Tienes preguntas? Contáctanos y estaremos encantados de
                     ayudarte.
                 </p>

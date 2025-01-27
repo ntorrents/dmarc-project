@@ -1,5 +1,5 @@
 import "./App.css";
-import Header from "./views/Header";
+import Header from "./views/Header/Header";
 import Services from "./views/Services";
 import Analysis from "./views/Analysis";
 import Plans from "./views/Plans";
