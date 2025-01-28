@@ -29,14 +29,11 @@ function Header() {
                         Protege tu Dominio con DMARC
                     </h1>
                     <p className="header__subtitle">
-                        Analizamos y configuramos correctamente DMARC, SPF y
-                        DKIM para tu empresa.
+                        Analizamos y configuramos DMARC, SPF y DKIM para tu
+                        empresa.
                     </p>
                 </div>
 
-                {/* <a href="#services" className="btn-primary">
-                        Descubre Nuestros Servicios
-                    </a> */}
                 <nav className="header__nav">
                     <a href="#home" className="header__link">
                         Inicio

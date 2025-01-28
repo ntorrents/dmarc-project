@@ -14,9 +14,9 @@
 
 .header--scrolled {
     height: 3rem;
-    background: white;
+    /* background: white; */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    color: #4caf50;
+    /* color: #4caf50; */
 }
 
 .header__container {
@@ -62,7 +62,7 @@
 
 .header__nav {
     display: flex;
-    gap: 1rem;
+    gap: 4rem;
 }
 
 .header__link {
