@@ -28,10 +28,10 @@ function Header() {
                     >
                         Protege tu Dominio con DMARC
                     </h1>
-                    <p className="header__subtitle">
+                    {/* <p className="header__subtitle">
                         Analizamos y configuramos DMARC, SPF y DKIM para tu
                         empresa.
-                    </p>
+                    </p> */}
                 </div>
 
                 <nav className="header__nav">

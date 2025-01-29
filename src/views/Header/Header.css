@@ -5,8 +5,8 @@
     width: 100%;
     transition: all 0.5s ease;
     z-index: 50;
-    background: #4caf50;
-    color: #fff;
+    /* background: #4caf50; */
+    color: #000;
     height: 11rem;
     padding: 2rem 1rem;
     text-align: center;

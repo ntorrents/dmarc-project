@@ -1,0 +1,42 @@
+.intro {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* position: relative; */
+    height: 100vh;
+    color: black;
+    background-image: url("bg-image.jpg");
+    background-size: cover;
+    background-size: 100% 120%;
+    /* background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+        url("bg-image.jpg"); */
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-left: -15px;
+    margin-right: -15px;
+}
+
+.intro-content {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    flex: 0 0 60%;
+    max-width: 60%;
+}
+
+.intro h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.intro p {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+}
+
+.safe {
+    color: #3e7840;
+}
