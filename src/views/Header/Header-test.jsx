@@ -19,7 +19,6 @@ function Header() {
 
     return (
         <header className={`header ${isScrolled ? "header--scrolled" : ""}`}>
-            <div className="clearfix"></div>
             <div className="header__container">
                 <div className="header__text">
                     <h1

@@ -15,7 +15,11 @@ function Intro() {
                             Block phishing, business email compromise,
                             ransomware, spam, and improve email deliverability
                         </p>
-                        <button>SIGN UP FREE</button>
+                        <div className="button">
+                            <a href="#" className="btn">
+                                SIGN UP FREE
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>

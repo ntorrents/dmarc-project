@@ -3,11 +3,10 @@
     justify-content: center;
     align-items: center;
     /* position: relative; */
-    height: 100vh;
-    color: black;
-    background-image: url("bg-image.jpg");
-    background-size: cover;
-    background-size: 100% 120%;
+    height: 105vh;
+    color: white;
+    background-image: url("bg-image2.jpg");
+    background-size: 100% 100%;
     /* background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
         url("bg-image.jpg"); */
 }
@@ -24,19 +23,52 @@
     margin-right: auto;
     text-align: center;
     flex: 0 0 60%;
-    max-width: 60%;
+    max-width: 55%;
 }
 
 .intro h1 {
-    font-size: 3rem;
+    font-size: 3.5rem;
+    line-height: 1.2;
     margin-bottom: 1rem;
 }
 
 .intro p {
-    font-size: 1rem;
+    font-weight: bold;
+    font-size: 1.2rem;
+    line-height: 2rem;
+    margin-top: 0;
     margin-bottom: 1rem;
 }
 
 .safe {
     color: #3e7840;
+}
+
+.btn {
+    display: inline-block;
+    white-space: nowrap;
+    vertical-align: middle;
+    user-select: none;
+    cursor: pointer;
+    padding: 15px 30px;
+    background: transparent;
+    color: white;
+    border: 2px solid white;
+    border-radius: 2px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    line-height: 1.5rem;
+    transition: all 0.5s ease;
+}
+
+.btn:hover {
+    color: black;
+    background: white;
+}
+
+.button a {
+    margin: 5px;
+    outline: 0;
+    text-decoration: none;
 }
