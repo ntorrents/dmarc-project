@@ -1,105 +1,106 @@
 /* General styles */
 * {
-    scroll-behavior: smooth;
+	scroll-behavior: smooth;
 }
 
 body::-webkit-scrollbar {
-    width: 12px; /* width of the entire scrollbar */
+	width: 6px; /* width of the entire scrollbar */
 }
 
 body::-webkit-scrollbar-track {
-    background: #4caf50; /* color of the tracking area */
+	background: transparent;
 }
 
 body::-webkit-scrollbar-thumb {
-    background-color: #484848; /* color of the scroll thumb */
-    border-radius: 20px; /* roundness of the scroll thumb */
+	background: #484848; /* color of the scroll thumb */
+	border-radius: 20px; /* roundness of the scroll thumb */
 }
 
 body {
-    font-family: "Rubik", "Montserrat", Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    line-height: 1.6;
+	font-family: "Rubik", "Montserrat", Arial, sans-serif;
+	margin: 0;
+	padding: 0;
+	line-height: 1.6;
+	overflow: overlay;
 }
 
 .align-center {
-    text-align: center;
-    padding-bottom: 1rem;
+	text-align: center;
+	padding-bottom: 1rem;
 }
 
 .container {
-    width: 90%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 1rem;
+	width: 90%;
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 1rem;
 }
 
 /* Section Titles */
 section h2 {
-    text-align: center;
-    margin-bottom: 1.5rem;
-    font-size: 2rem;
+	text-align: center;
+	margin-bottom: 1.5rem;
+	font-size: 2rem;
 }
 
 /* Services Section - Se añade un marginTop para arreglar la posicion del header*/
 .services {
-    margin-top: 16rem;
+	margin-top: 1rem;
 }
 
 .service-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+	gap: 1.5rem;
 }
 
 /* Pricing Section */
 .pricing-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
-    text-align: center;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+	gap: 1.5rem;
+	text-align: center;
 }
 
 /* Contact Section */
 .contact-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    max-width: 500px;
-    margin: 0 auto;
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+	max-width: 500px;
+	margin: 0 auto;
 }
 
 .contact-form input,
 .contact-form textarea {
-    width: 100%;
-    padding: 0.8rem;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+	width: 100%;
+	padding: 0.8rem;
+	border: 1px solid #ddd;
+	border-radius: 5px;
 }
 
 .contact-form button {
-    background: #4caf50;
-    color: #fff;
-    padding: 0.8rem 1.2rem;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+	background: #4caf50;
+	color: #fff;
+	padding: 0.8rem 1.2rem;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
 }
 
 .contact-form button:hover {
-    background: #45a049;
+	background: #45a049;
 }
 
 /* Footer */
 .footer {
-    background: #333;
-    color: #fff;
-    text-align: center;
-    padding: 1rem 0;
-    margin-top: 2rem;
+	background: #333;
+	color: #fff;
+	text-align: center;
+	padding: 1rem 0;
+	margin-top: 2rem;
 }
 
 .footer p {
-    margin: 0;
+	margin: 0;
 }
