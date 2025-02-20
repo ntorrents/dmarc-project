@@ -1,82 +1,87 @@
+.analysis {
+	background-color: #f3f1f1;
+	padding: 1rem 0 2rem 0;
+	margin-top: 2rem;
+}
 .analysis-form {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    justify-content: center;
-    margin-top: 1rem;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+	justify-content: center;
+	margin-top: 1rem;
 }
 
 .analysis-form input {
-    padding: 0.8rem;
-    width: 300px;
-    max-width: 100%;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+	padding: 0.8rem;
+	width: 300px;
+	max-width: 100%;
+	border: 1px solid #ddd;
+	border-radius: 5px;
 }
 
 .analysis-form button {
-    background: #4caf50;
-    color: #fff;
-    padding: 0.8rem 1.2rem;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+	background: #4caf50;
+	color: #fff;
+	padding: 0.8rem 1.2rem;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
 }
 
 .analysis-form button:hover {
-    background: #45a049;
+	background: #45a049;
 }
 
 .analysis-result {
-    margin-top: 1rem;
-    padding: 1.5rem;
-    border-radius: 8px;
-    text-align: center;
-    font-size: 1rem;
-    font-weight: bold;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    max-width: 400px;
-    margin-left: auto;
-    margin-right: auto;
-    position: relative;
-    background-color: #f9f9f9;
-    opacity: 0;
-    transform: translateY(20px);
-    pointer-events: none; /* Desactiva interacción mientras está oculto */
-    transition: opacity 5s ease, transform 5s ease;
+	margin-top: 1rem;
+	padding: 1.5rem;
+	border-radius: 8px;
+	text-align: center;
+	font-size: 1rem;
+	font-weight: bold;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+	max-width: 400px;
+	margin-left: auto;
+	margin-right: auto;
+	position: relative;
+	background-color: #f9f9f9;
+	opacity: 0;
+	transform: translateY(20px);
+	pointer-events: none; /* Desactiva interacción mientras está oculto */
+	transition: opacity 5s ease, transform 5s ease;
 }
 
 .analysis-result.visible {
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: auto; /* Activa interacción cuando es visible */
+	opacity: 1;
+	transform: translateY(0);
+	pointer-events: auto; /* Activa interacción cuando es visible */
 }
 
 .analysis-result.success {
-    background-color: #d4f8e8;
-    color: #2b8a6d;
-    border: 1px solid #2b8a6d;
+	background-color: #d4f8e8;
+	color: #2b8a6d;
+	border: 1px solid #2b8a6d;
 }
 
 .analysis-result.error {
-    background-color: #fde8e8;
-    color: #c1292e;
-    border: 1px solid #c1292e;
+	background-color: #fde8e8;
+	color: #c1292e;
+	border: 1px solid #c1292e;
 }
 
 .close-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: none;
-    border: none;
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #888;
-    cursor: pointer;
-    transition: color 0.3s ease;
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	background: none;
+	border: none;
+	font-size: 1.2rem;
+	font-weight: bold;
+	color: #888;
+	cursor: pointer;
+	transition: color 0.3s ease;
 }
 
 .close-btn:hover {
-    color: #333;
+	color: #333;
 }

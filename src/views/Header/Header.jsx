@@ -23,17 +23,33 @@ function Header() {
 			<div className="header__container">
 				<h1 className="header__title">SAFEDMARC</h1>
 
-				<nav className="header__nav">
-					<a href="#home" className="header__link">
-						Inicio
-					</a>
-					<a href="#services" className="header__link">
-						Servicios
-					</a>
-					<a href="#contact" className="header__link">
-						Contacto
-					</a>
-				</nav>
+				<ul className="nav-bar">
+					<li className="nav-item">
+						<a href="#home" className="nav-link">
+							Home
+						</a>
+					</li>
+					<li className="nav-item">
+						<a href="#prices" className="nav-link">
+							Pricing
+						</a>
+					</li>
+					<li className="nav-item">
+						<a href="#contact" className="nav-link">
+							Contact
+						</a>
+					</li>
+					<li className="nav-item">
+						<a href="#login" className="nav-link">
+							Log In
+						</a>
+					</li>
+					<li>
+						<a href="register" className="gn-button">
+							Free Trial
+						</a>
+					</li>
+				</ul>
 			</div>
 		</header>
 	);
