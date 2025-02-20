@@ -5,10 +5,12 @@ import Analysis from "./views/Analysis/Analysis";
 import Plans from "./views/Plans";
 import Contact from "./views/Contact";
 import Footer from "./views/Footer";
+import Intro from "./views/Intro/Intro";
 
 function App() {
     return (
         <div className="App">
+            <Intro />
             <Header />
             <Services />
             <Analysis />
