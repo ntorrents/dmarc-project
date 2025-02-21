@@ -6,19 +6,21 @@ import Plans from "./views/Plans";
 import Contact from "./views/Contact";
 import Footer from "./views/Footer";
 import Intro from "./views/Intro/Intro";
+import Summary from "./views/summary";
 
 function App() {
-    return (
-        <div className="App">
-            <Intro />
-            <Header />
-            <Services />
-            <Analysis />
-            <Plans />
-            <Contact />
-            <Footer />
-        </div>
-    );
+	return (
+		<div className="App">
+			<Intro />
+			<Header />
+			<Services />
+			<Analysis />
+			<Plans />
+			<Summary />
+			<Contact />
+			<Footer />
+		</div>
+	);
 }
 
 export default App;
