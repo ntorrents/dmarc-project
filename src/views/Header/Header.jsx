@@ -1,5 +1,6 @@
 import "./Header.css";
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 function Header() {
 	const [isScrolled, setIsScrolled] = useState(false);
@@ -25,19 +26,19 @@ function Header() {
 
 				<ul className="nav-bar">
 					<li className="nav-item">
-						<a href="#home" className="nav-link">
+						<Link to="/" className="nav-link">
 							Home
-						</a>
+						</Link>
 					</li>
 					<li className="nav-item">
-						<a href="#prices" className="nav-link">
+						<Link to="/pricing" className="nav-link">
 							Pricing
-						</a>
+						</Link>
 					</li>
 					<li className="nav-item">
-						<a href="#contact" className="nav-link">
+						<Link to="/contact" className="nav-link">
 							Contact
-						</a>
+						</Link>
 					</li>
 					<li className="nav-item">
 						<a href="#login" className="nav-link">

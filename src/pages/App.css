@@ -3,35 +3,32 @@
 	scroll-behavior: smooth;
 }
 
-html {
-	/* scrollbar-gutter: stable overlay; */
+body {
 	overflow: overlay;
+	font-family: "Poppins", "Atkinson Hyperlegible Mono", serif;
+	margin: 0;
+	padding: 0;
+	line-height: 1.6;
 }
 
-body::-webkit-scrollbar {
+*::-webkit-scrollbar {
+	display: block;
 	width: 6px; /* width of the entire scrollbar */
 }
 
-body::-webkit-scrollbar-track {
+*::-webkit-scrollbar-track {
 	background: rgba(255, 255, 255, 0.2); /* Fondo semitransparente */
 	backdrop-filter: blur(10px); /* Efecto borroso */
 	border-radius: 6px; /* Bordes redondeados */
 }
 
-body::-webkit-scrollbar-thumb {
+*::-webkit-scrollbar-thumb {
 	background: rgba(100, 100, 100, 0.7); /* Color gris semiopaco */
 	border-radius: 6px; /* Bordes redondeados */
 }
 
-::-webkit-scrollbar-thumb:hover {
+*::-webkit-scrollbar-thumb:hover {
 	background: rgba(100, 100, 100, 0.9);
-}
-
-body {
-	font-family: "Poppins", "Atkinson Hyperlegible Mono", serif;
-	margin: 0;
-	padding: 0;
-	line-height: 1.6;
 }
 
 .align-center {
@@ -77,40 +74,51 @@ section h2 {
 	background: #f4f4f4;
 	margin-top: 2rem;
 	padding: 1rem 0;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-}
-
-.grid8 {
-	display: grid;
-	grid-template-columns: repeat(2, 1fr); /* 2 columnas iguales */
-	grid-template-rows: repeat(4, auto); /* 4 filas ajustadas al contenido */
-	gap: 20px; /* Espacio entre elementos */
-	padding: 20px;
-	max-width: 800px; /* Ajusta el ancho máximo */
-	margin: auto; /* Centra la sección */
-}
-
-.grid-item {
-	background: #f3f3f3;
-	padding: 20px;
-	border-radius: 10px;
 	text-align: center;
-	box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.grid-item h3 {
+.summary h2 {
+	font-size: 24px;
+	margin-bottom: 5px;
+}
+
+.summary p {
+	font-size: 16px;
+	opacity: 0.7;
+	margin-bottom: 30px;
+}
+
+.grid-benefits {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	grid-template-rows: repeat(3, auto);
+	gap: 20px;
+	max-width: 900px;
+	margin: auto;
+}
+
+.benefit-item {
+	display: flex;
+	align-items: center;
+	gap: 15px;
+	text-align: left;
+}
+
+.benefit-item img {
+	width: 40px;
+	height: 40px;
+}
+
+.benefit-item h3 {
 	font-size: 18px;
+	margin: 0;
 	color: #45a049;
-	margin-bottom: 8px;
 }
 
-.grid-item p {
+.benefit-item p {
 	font-size: 14px;
-	color: #333;
-	line-height: 1.4;
+	opacity: 0.8;
+	margin: 5px 0 0;
 }
 
 /* Contact Section */

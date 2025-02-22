@@ -2,54 +2,66 @@ function Summary() {
 	return (
 		<section className="summary">
 			<div className="container align-center">
-				<h1>Why choose SafeDMARC</h1>
-				<div className="grid8">
-					<div className="grid-item">
-						<h3>Email Protection</h3>
-						<p>
-							Prevent spammers and phishing sites from sending emails via your
-							domains.
-						</p>
+				<h2>Why Choose Us?</h2>
+				<p>What Our Customers Like About Our Service</p>
+				<div className="grid-benefits">
+					<div className="benefit-item">
+						<img src="icon1.png" alt="Email Protection" />
+						<div>
+							<h3>Email Protection</h3>
+							<p>
+								Prevent spammers and phishing sites from sending emails via your
+								domains.
+							</p>
+						</div>
 					</div>
-					<div className="grid-item">
-						<h3>Easy Setup</h3>
-						<p>Quick and hassle-free DMARC implementation for any domain.</p>
+
+					<div className="benefit-item">
+						<img src="icon2.png" alt="Improve Deliverability" />
+						<div>
+							<h3>Improve Deliverability</h3>
+							<p>
+								Improve your email deliverability by implementing DMARC
+								effectively.
+							</p>
+						</div>
 					</div>
-					<div className="grid-item">
-						<h3>Anti-Phishing</h3>
-						<p>
-							Ensure your customers receive only legitimate emails from your
-							brand.
-						</p>
+
+					<div className="benefit-item">
+						<img src="icon3.png" alt="Full Visibility" />
+						<div>
+							<h3>Full Visibility</h3>
+							<p>
+								Maintain full visibility over email health. Detect and fix
+								issues.
+							</p>
+						</div>
 					</div>
-					<div className="grid-item">
-						<h3>Detailed Reports</h3>
-						<p>
-							Get in-depth DMARC reports to analyze email security performance.
-						</p>
+
+					<div className="benefit-item">
+						<img src="icon4.png" alt="Reports & Alerts" />
+						<div>
+							<h3>Reports & Alerts</h3>
+							<p>Stay informed. Get periodic reports on DMARC compliance.</p>
+						</div>
 					</div>
-					<div className="grid-item">
-						<h3>Compliance</h3>
-						<p>
-							Meet industry standards and improve domain security practices.
-						</p>
+
+					<div className="benefit-item">
+						<img src="icon5.png" alt="Forensic Reports" />
+						<div>
+							<h3>Forensic Reports</h3>
+							<p>Track down emails that cause DMARC compliance failures.</p>
+						</div>
 					</div>
-					<div className="grid-item">
-						<h3>Expert Support</h3>
-						<p>Our team helps you configure and optimize DMARC settings.</p>
-					</div>
-					<div className="grid-item">
-						<h3>Real-Time Monitoring</h3>
-						<p>
-							Stay informed with live insights on email authentication failures.
-						</p>
-					</div>
-					<div className="grid-item">
-						<h3>Seamless Integration</h3>
-						<p>
-							Works with existing email security protocols for better
-							protection.
-						</p>
+
+					<div className="benefit-item">
+						<img src="icon6.png" alt="DNS Toolbox" />
+						<div>
+							<h3>DNS Toolbox</h3>
+							<p>
+								We provide tools to diagnose DNS issues like SPF/DKIM/DMARC.
+							</p>
+						</div>
 					</div>
 				</div>
 			</div>

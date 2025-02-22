@@ -1,6 +1,6 @@
-function Contact() {
+function HomeContact() {
 	return (
-		<section id="contact" className="contact">
+		<section id="home-contact" className="home-contact">
 			<div className="container">
 				<h2>Contact Us</h2>
 				<p className="align-center">
@@ -19,4 +19,4 @@ function Contact() {
 	);
 }
 
-export default Contact;
+export default HomeContact;
