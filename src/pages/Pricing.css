@@ -1,49 +1,98 @@
 .pricing-page {
 	text-align: center;
-	font-family: Arial, sans-serif;
-	color: #000;
 }
 
-.pricing-header {
+.pricing-hero {
 	background: url("bg-pc.jpg") no-repeat center;
 	background-size: cover;
 	padding: 80px 20px;
 	color: white;
 }
 
-.pricing-header h1 {
+.pricing-hero h1 {
 	font-size: 2.5rem;
 	margin-bottom: 10px;
 }
 
-.pricing-header p {
+.pricing-hero p {
 	font-size: 1.2rem;
-	opacity: 0.9;
 }
 
-.pricing-container {
-	display: flex;
-	justify-content: center;
-	gap: 20px;
-	padding: 40px;
+.pricing-table {
+	overflow-x: auto;
+	margin: 4rem;
 }
 
-.pricing-card {
-	background: #fff;
-	padding: 20px;
-	border-radius: 8px;
-	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+table {
+	width: 100%;
+	border-collapse: collapse;
+	background: white;
+}
+
+th,
+td {
+	padding: 15px;
+	border: 1px solid #ddd;
 	text-align: center;
-	width: 250px;
 }
 
-.pricing-card h2 {
-	color: #45a049;
-	margin-bottom: 10px;
+th {
+	background-color: #45a049;
+	color: white;
+	font-size: 1.2rem;
 }
 
-.pricing-card span {
-	font-size: 1.5rem;
-	font-weight: bold;
+td {
+	font-size: 1rem;
 	color: #333;
+}
+
+tr:nth-child(even) {
+	background-color: #f3f3f3;
+}
+
+tr:hover {
+	background-color: rgba(69, 160, 73, 0.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+	.pricing-hero {
+		height: 250px;
+		padding: 0 20px;
+	}
+
+	th,
+	td {
+		padding: 10px;
+		font-size: 0.9rem;
+	}
+}
+
+@media (max-width: 480px) {
+	.pricing-hero {
+		height: 200px;
+		padding: 0 15px;
+	}
+
+	th,
+	td {
+		padding: 8px;
+		font-size: 0.8rem;
+	}
+}
+
+.select-btn {
+	background-color: #45a049;
+	color: white;
+	border: none;
+	padding: 10px 20px;
+	font-size: 16px;
+	cursor: pointer;
+	border-radius: 5px;
+	transition: background 0.3s;
+}
+
+.select-btn:hover {
+	background-color: #388e3c;
 }

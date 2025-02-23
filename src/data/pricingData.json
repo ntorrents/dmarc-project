@@ -1,0 +1,38 @@
+{
+	"Basic": {
+		"Domains": "1",
+		"Users": "1",
+		"Email Reports": "Weekly",
+		"DMARC Policy": "Monitor",
+		"SPF/DKIM Setup": "Manual",
+		"Threat Intelligence": "No",
+		"Support": "Email",
+		"API Access": "No",
+		"Incident Alerts": "Basic",
+		"Custom Reports": "No"
+	},
+	"Standard": {
+		"Domains": "3",
+		"Users": "5",
+		"Email Reports": "Daily",
+		"DMARC Policy": "Quarantine",
+		"SPF/DKIM Setup": "Assisted",
+		"Threat Intelligence": "Yes",
+		"Support": "Email & Chat",
+		"API Access": "Yes",
+		"Incident Alerts": "Advanced",
+		"Custom Reports": "Yes"
+	},
+	"Premium": {
+		"Domains": "Unlimited",
+		"Users": "10",
+		"Email Reports": "Real-time",
+		"DMARC Policy": "Reject",
+		"SPF/DKIM Setup": "Automated",
+		"Threat Intelligence": "Yes",
+		"Support": "Priority Support",
+		"API Access": "Yes",
+		"Incident Alerts": "Enterprise",
+		"Custom Reports": "Yes"
+	}
+}

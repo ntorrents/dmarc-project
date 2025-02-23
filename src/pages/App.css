@@ -125,6 +125,7 @@ section h2 {
 .contact-form {
 	display: flex;
 	flex-direction: column;
+	align-items: center;
 	gap: 1rem;
 	max-width: 500px;
 	margin: 0 auto;
@@ -141,6 +142,7 @@ section h2 {
 .contact-form button {
 	background: #4caf50;
 	color: #fff;
+	width: 200px;
 	padding: 0.8rem 1.2rem;
 	border: none;
 	border-radius: 5px;

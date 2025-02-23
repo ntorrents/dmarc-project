@@ -22,7 +22,9 @@ function Header() {
 		<header className={`header ${isScrolled ? "header--scrolled" : ""}`}>
 			<div className="clearfix"></div>
 			<div className="header__container">
-				<h1 className="header__title">SAFEDMARC</h1>
+				<h1 className="header__title">
+					<span>SAFE</span>DMARC
+				</h1>
 
 				<ul className="nav-bar">
 					<li className="nav-item">

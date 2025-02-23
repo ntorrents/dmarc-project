@@ -38,8 +38,16 @@
 .header__title {
 	font-family: "Atkinson Hyperlegible Mono", serif;
 	font-size: 0.8rem;
-	/* color: #fff; */
 	font-weight: 500;
+	user-select: none;
+}
+
+.header__title span {
+	font-weight: 700;
+}
+
+.header--scrolled .header__title span {
+	color: #45a049;
 }
 
 .nav-bar {

@@ -1,7 +1,5 @@
 .contactPage-page {
 	text-align: center;
-	font-family: Arial, sans-serif;
-	color: #000;
 }
 
 .contactPage-header {
@@ -18,7 +16,6 @@
 
 .contactPage-header p {
 	font-size: 1.2rem;
-	opacity: 0.9;
 }
 
 .contactPage-container {
