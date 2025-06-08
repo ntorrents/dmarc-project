@@ -1,26 +1,33 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Home from "./pages/App";
-import Pricing from "./pages/Pricing2";
-import Contact from "./pages/Contact";
-import Header from "./views/Header/Header";
-import Footer from "./views/Footer";
-import ScrollToTop from "./functions/scrollToTop";
-import Checkout from "./pages/Checkout";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { AnimatePresence } from 'framer-motion'
+import Home from './pages/Home'
+import Pricing from './pages/Pricing'
+import Contact from './pages/Contact'
+import Checkout from './pages/Checkout'
+import Header from './components/layout/Header'
+import Footer from './components/layout/Footer'
+import ScrollToTop from './utils/ScrollToTop'
 
 const AppRoutes = () => {
-	return (
-		<Router>
-			<ScrollToTop />
-			<Header />
-			<Routes>
-				<Route path="/" element={<Home />} />
-				<Route path="/pricing" element={<Pricing />} />
-				<Route path="/contact" element={<Contact />} />
-				<Route path="/checkout" element={<Checkout />} />
-			</Routes>
-			<Footer />
-		</Router>
-	);
-};
+  return (
+    <Router>
+      <ScrollToTop />
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-grow">
+          <AnimatePresence mode="wait">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/checkout" element={<Checkout />} />
+            </Routes>
+          </AnimatePresence>
+        </main>
+        <Footer />
+      </div>
+    </Router>
+  )
+}
 
-export default AppRoutes;
+export default AppRoutes
