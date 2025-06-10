@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, CheckCircle, XCircle, AlertCircle, Loader2, X } from 'lucide-react'
+import { Search, CheckCircle, XCircle, AlertCircle, Loader2, X, Shield, Mail } from 'lucide-react'
 import { checkDMARC } from '../../utils/dmarcChecker'
 
 const DomainChecker = () => {
