@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import Hero from '../components/sections/Hero'
 import Services from '../components/sections/Services'
+import Accordion from '../components/sections/Accordion'
 import DomainChecker from '../components/sections/DomainChecker'
 import Pricing from '../components/sections/Pricing'
 import Benefits from '../components/sections/Benefits'
@@ -16,6 +17,7 @@ const Home = () => {
     >
       <Hero />
       <Services />
+      <Accordion />
       <DomainChecker />
       <Pricing />
       <Benefits />
