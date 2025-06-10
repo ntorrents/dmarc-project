@@ -18,6 +18,19 @@ const Hero = () => {
         }} />
       </div>
 
+      {/* Enterprise Badge */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+        className="absolute top-24 left-8 z-20"
+      >
+        <div className="inline-flex items-center px-4 py-2 bg-primary-500/20 rounded-full text-primary-200 text-sm font-medium backdrop-blur-sm border border-primary-400/30">
+          <Shield className="w-4 h-4 mr-2" />
+          Enterprise Email Security
+        </div>
+      </motion.div>
+
       <div className="container-custom relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Content */}
@@ -27,16 +40,6 @@ const Hero = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-white"
           >
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="inline-flex items-center px-4 py-2 bg-primary-500/20 rounded-full text-primary-200 text-sm font-medium mb-6"
-            >
-              <Shield className="w-4 h-4 mr-2" />
-              Enterprise Email Security
-            </motion.div>
-
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
               Protect Your Email with{' '}
               <span className="text-gradient bg-gradient-to-r from-primary-400 to-primary-200 bg-clip-text text-transparent">
@@ -88,15 +91,15 @@ const Hero = () => {
               transition={{ duration: 0.6, delay: 1 }}
               className="mt-12 pt-8 border-t border-gray-700"
             >
-              <p className="text-gray-400 text-sm mb-4">Trusted by 10,000+ businesses worldwide</p>
+              <p className="text-gray-400 text-sm mb-4">Built for modern businesses</p>
               <div className="flex items-center space-x-8 opacity-60">
-                <div className="text-2xl font-bold">10K+</div>
+                <div className="text-2xl font-bold">14-Day</div>
                 <div className="text-2xl font-bold">99.9%</div>
                 <div className="text-2xl font-bold">24/7</div>
               </div>
               <div className="flex items-center space-x-8 text-xs text-gray-500 mt-1">
-                <div>Domains Protected</div>
-                <div>Uptime</div>
+                <div>Free Trial</div>
+                <div>Uptime SLA</div>
                 <div>Support</div>
               </div>
             </motion.div>
@@ -110,7 +113,7 @@ const Hero = () => {
             className="relative"
           >
             <div className="relative">
-              {/* Main Shield */}
+              {/* Main Shield - Made smaller */}
               <motion.div
                 animate={{ 
                   y: [0, -10, 0],
@@ -121,12 +124,12 @@ const Hero = () => {
                   repeat: Infinity,
                   ease: "easeInOut"
                 }}
-                className="relative z-10 bg-gradient-primary rounded-3xl p-8 shadow-2xl"
+                className="relative z-10 bg-gradient-primary rounded-3xl p-6 shadow-2xl w-48 h-48 flex items-center justify-center mx-auto"
               >
-                <Shield className="w-32 h-32 text-white mx-auto" />
+                <Shield className="w-20 h-20 text-white" />
               </motion.div>
 
-              {/* Floating Elements */}
+              {/* Floating Elements - Made same size as main shield elements */}
               <motion.div
                 animate={{ 
                   y: [0, -15, 0],
@@ -138,7 +141,7 @@ const Hero = () => {
                   ease: "easeInOut",
                   delay: 1
                 }}
-                className="absolute -top-4 -right-4 bg-white/10 backdrop-blur-sm rounded-xl p-4"
+                className="absolute -top-4 -right-4 bg-white/10 backdrop-blur-sm rounded-xl p-4 w-20 h-20 flex flex-col items-center justify-center"
               >
                 <div className="text-white text-sm font-medium">DMARC</div>
                 <div className="text-primary-300 text-xs">Protected</div>
@@ -155,7 +158,7 @@ const Hero = () => {
                   ease: "easeInOut",
                   delay: 2
                 }}
-                className="absolute -bottom-4 -left-4 bg-white/10 backdrop-blur-sm rounded-xl p-4"
+                className="absolute -bottom-4 -left-4 bg-white/10 backdrop-blur-sm rounded-xl p-4 w-20 h-20 flex flex-col items-center justify-center"
               >
                 <div className="text-white text-sm font-medium">SPF</div>
                 <div className="text-primary-300 text-xs">Verified</div>
@@ -172,7 +175,7 @@ const Hero = () => {
                   ease: "easeInOut",
                   delay: 0.5
                 }}
-                className="absolute top-1/2 -right-8 bg-white/10 backdrop-blur-sm rounded-xl p-4"
+                className="absolute top-1/2 -right-8 bg-white/10 backdrop-blur-sm rounded-xl p-4 w-20 h-20 flex flex-col items-center justify-center"
               >
                 <div className="text-white text-sm font-medium">DKIM</div>
                 <div className="text-primary-300 text-xs">Signed</div>

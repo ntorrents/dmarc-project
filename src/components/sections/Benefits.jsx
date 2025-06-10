@@ -70,7 +70,7 @@ const Benefits = () => {
             Why Choose SafeDMARC?
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Discover what our customers love about our comprehensive email security service
+            Discover what makes our email security service the right choice for your business
           </p>
         </motion.div>
 
@@ -115,29 +115,29 @@ const Benefits = () => {
           <div className="bg-gradient-primary rounded-2xl p-8 md:p-12 text-white">
             <div className="text-center mb-12">
               <h3 className="text-2xl md:text-3xl font-bold mb-4">
-                Trusted by Organizations Worldwide
+                Built for Modern Businesses
               </h3>
               <p className="text-xl text-primary-100">
-                Join thousands of businesses protecting their email communications
+                Comprehensive email security designed with your success in mind
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
               <div>
-                <div className="text-4xl md:text-5xl font-bold mb-2">10,000+</div>
-                <div className="text-primary-200">Domains Protected</div>
+                <div className="text-4xl md:text-5xl font-bold mb-2">14-Day</div>
+                <div className="text-primary-200">Free Trial</div>
               </div>
               <div>
                 <div className="text-4xl md:text-5xl font-bold mb-2">99.9%</div>
-                <div className="text-primary-200">Uptime Guarantee</div>
+                <div className="text-primary-200">Uptime SLA</div>
               </div>
               <div>
                 <div className="text-4xl md:text-5xl font-bold mb-2">24/7</div>
                 <div className="text-primary-200">Expert Support</div>
               </div>
               <div>
-                <div className="text-4xl md:text-5xl font-bold mb-2">50M+</div>
-                <div className="text-primary-200">Emails Analyzed</div>
+                <div className="text-4xl md:text-5xl font-bold mb-2">30-Day</div>
+                <div className="text-primary-200">Money Back</div>
               </div>
             </div>
           </div>
