@@ -47,7 +47,7 @@ const Accordion = () => {
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-          {/* Illustration */}
+          {/* Illustration - Made bigger */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -56,8 +56,8 @@ const Accordion = () => {
             className="flex justify-center lg:justify-start"
           >
             <div className="relative">
-              <div className="w-80 h-80 bg-gradient-primary rounded-full flex items-center justify-center relative overflow-hidden">
-                <Shield className="w-32 h-32 text-white z-10" />
+              <div className="w-96 h-96 bg-gradient-primary rounded-full flex items-center justify-center relative overflow-hidden">
+                <Shield className="w-40 h-40 text-white z-10" />
                 
                 {/* Floating elements */}
                 <motion.div
@@ -71,17 +71,17 @@ const Accordion = () => {
                   }}
                   className="absolute inset-0"
                 >
-                  <div className="absolute top-8 left-8 w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
-                    <Mail className="w-6 h-6 text-white" />
+                  <div className="absolute top-8 left-8 w-16 h-16 bg-white/20 rounded-lg flex items-center justify-center">
+                    <Mail className="w-8 h-8 text-white" />
                   </div>
-                  <div className="absolute top-8 right-8 w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
-                    <Lock className="w-6 h-6 text-white" />
+                  <div className="absolute top-8 right-8 w-16 h-16 bg-white/20 rounded-lg flex items-center justify-center">
+                    <Lock className="w-8 h-8 text-white" />
                   </div>
-                  <div className="absolute bottom-8 left-8 w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
-                    <Eye className="w-6 h-6 text-white" />
+                  <div className="absolute bottom-8 left-8 w-16 h-16 bg-white/20 rounded-lg flex items-center justify-center">
+                    <Eye className="w-8 h-8 text-white" />
                   </div>
-                  <div className="absolute bottom-8 right-8 w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
-                    <Shield className="w-6 h-6 text-white" />
+                  <div className="absolute bottom-8 right-8 w-16 h-16 bg-white/20 rounded-lg flex items-center justify-center">
+                    <Shield className="w-8 h-8 text-white" />
                   </div>
                 </motion.div>
               </div>

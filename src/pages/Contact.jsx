@@ -72,7 +72,7 @@ const Contact = () => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
-      className="pt-20"
+      className="-mt-20 pt-20"
     >
       {/* Hero Section */}
       <section className="bg-gradient-hero text-white py-20">

@@ -10,7 +10,7 @@ const Hero = () => {
   ]
 
   return (
-    <section className="relative min-h-screen flex items-center bg-gradient-hero overflow-hidden">
+    <section className="relative min-h-screen flex items-center bg-gradient-hero overflow-hidden -mt-20 pt-20">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute inset-0" style={{
@@ -18,12 +18,12 @@ const Hero = () => {
         }} />
       </div>
 
-      {/* Enterprise Badge */}
+      {/* Enterprise Badge - Moved to right side */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
-        className="absolute top-24 left-8 z-20"
+        className="absolute top-24 right-8 z-20"
       >
         <div className="inline-flex items-center px-4 py-2 bg-primary-500/20 rounded-full text-primary-200 text-sm font-medium backdrop-blur-sm border border-primary-400/30">
           <Shield className="w-4 h-4 mr-2" />
