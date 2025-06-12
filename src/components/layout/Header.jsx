@@ -9,7 +9,7 @@ const Header = () => {
   const location = useLocation()
 
   // Check if we're on a page that should have a dark header initially
-  const isDarkPage = location.pathname === '/pricing' || location.pathname === '/contact'
+  const isDarkPage = ['/pricing', '/contact', '/login', '/signup', '/terms', '/privacy', '/dashboard'].includes(location.pathname)
 
   useEffect(() => {
     const handleScroll = () => {

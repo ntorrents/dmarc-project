@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Mail, Lock, Eye, EyeOff, Shield, ArrowRight, User, Building, Check } from 'lucide-react'
 
 const Signup = () => {
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -35,55 +36,13 @@ const Signup = () => {
     setTimeout(() => {
       console.log('Signup attempt:', formData)
       setIsLoading(false)
-      setStep(2) // Move to success step
+      // Redirect to dashboard after successful signup
+      navigate('/dashboard')
     }, 2000)
   }
 
   const validatePassword = () => {
     return formData.password.length >= 8 && formData.password === formData.confirmPassword
-  }
-
-  if (step === 2) {
-    return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.3 }}
-        className="min-h-screen bg-gradient-hero flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
-      >
-        <div className="max-w-md w-full">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6 }}
-            className="bg-white rounded-xl shadow-2xl p-8 text-center"
-          >
-            <div className="flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mx-auto mb-6">
-              <Check className="w-8 h-8 text-green-600" />
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              Account Created Successfully!
-            </h2>
-            <p className="text-gray-600 mb-6">
-              Welcome to SafeDMARC! We've sent a verification email to{' '}
-              <span className="font-medium text-gray-900">{formData.email}</span>
-            </p>
-            <div className="space-y-4">
-              <Link to="/login" className="btn-primary w-full">
-                Sign In to Your Account
-              </Link>
-              <p className="text-sm text-gray-500">
-                Didn't receive the email? Check your spam folder or{' '}
-                <button className="text-primary-600 hover:underline">
-                  resend verification
-                </button>
-              </p>
-            </div>
-          </motion.div>
-        </div>
-      </motion.div>
-    )
   }
 
   return (
@@ -92,7 +51,7 @@ const Signup = () => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
-      className="min-h-screen bg-gradient-hero flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
+      className="min-h-screen bg-gradient-hero flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 pt-24"
     >
       <div className="max-w-md w-full space-y-8">
         {/* Header */}

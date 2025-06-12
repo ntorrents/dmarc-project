@@ -6,6 +6,9 @@ import Contact from './pages/Contact'
 import Checkout from './pages/Checkout'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
+import Dashboard from './pages/Dashboard'
+import Terms from './pages/Terms'
+import Privacy from './pages/Privacy'
 import Header from './components/layout/Header'
 import Footer from './components/layout/Footer'
 import ScrollToTop from './utils/ScrollToTop'
@@ -25,6 +28,9 @@ const AppRoutes = () => {
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/privacy" element={<Privacy />} />
             </Routes>
           </AnimatePresence>
         </main>

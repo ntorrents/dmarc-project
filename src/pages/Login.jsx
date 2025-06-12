@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Mail, Lock, Eye, EyeOff, Shield, ArrowRight } from 'lucide-react'
 
 const Login = () => {
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -28,6 +29,8 @@ const Login = () => {
     setTimeout(() => {
       console.log('Login attempt:', formData)
       setIsLoading(false)
+      // Redirect to dashboard after successful login
+      navigate('/dashboard')
     }, 2000)
   }
 
@@ -37,7 +40,7 @@ const Login = () => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
-      className="min-h-screen bg-gradient-hero flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
+      className="min-h-screen bg-gradient-hero flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 pt-24"
     >
       <div className="max-w-md w-full space-y-8">
         {/* Header */}
