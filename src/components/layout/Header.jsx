@@ -8,6 +8,9 @@ const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const location = useLocation()
 
+  // Check if we're on a page that should have a dark header initially
+  const isDarkPage = ['/pricing', '/contact', '/login', '/signup', '/terms', '/privacy', '/dashboard'].includes(location.pathname)
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20)
@@ -23,15 +26,48 @@ const Header = () => {
     { name: 'Contact', href: '/contact' },
   ]
 
+  // Determine header styling based on page and scroll state
+  const getHeaderStyles = () => {
+    if (isScrolled) {
+      return 'bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-200'
+    } else if (isDarkPage) {
+      return 'bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-200'
+    } else {
+      return 'bg-transparent'
+    }
+  }
+
+  const getTextStyles = () => {
+    if (isScrolled || isDarkPage) {
+      return 'text-gray-900'
+    } else {
+      return 'text-white'
+    }
+  }
+
+  const getNavTextStyles = (isActive = false) => {
+    if (isActive) {
+      return 'text-primary-500'
+    } else if (isScrolled || isDarkPage) {
+      return 'text-gray-700'
+    } else {
+      return 'text-white'
+    }
+  }
+
+  const getButtonStyles = () => {
+    if (isScrolled || isDarkPage) {
+      return 'text-gray-700 hover:bg-gray-100'
+    } else {
+      return 'text-white hover:bg-white/10'
+    }
+  }
+
   return (
     <motion.header
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? 'bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-200'
-          : 'bg-transparent'
-      }`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${getHeaderStyles()}`}
     >
       <div className="container-custom">
         <div className="flex items-center justify-between h-16 lg:h-20">
@@ -40,9 +76,7 @@ const Header = () => {
             <div className="flex items-center justify-center w-10 h-10 bg-gradient-primary rounded-lg">
               <Shield className="w-6 h-6 text-white" />
             </div>
-            <span className={`text-xl font-bold transition-colors ${
-              isScrolled ? 'text-gray-900' : 'text-white'
-            }`}>
+            <span className={`text-xl font-bold transition-colors ${getTextStyles()}`}>
               Safe<span className="text-primary-500">DMARC</span>
             </span>
           </Link>
@@ -53,13 +87,7 @@ const Header = () => {
               <Link
                 key={item.name}
                 to={item.href}
-                className={`text-sm font-medium transition-colors hover:text-primary-500 ${
-                  location.pathname === item.href
-                    ? 'text-primary-500'
-                    : isScrolled
-                    ? 'text-gray-700'
-                    : 'text-white'
-                }`}
+                className={`text-sm font-medium transition-colors hover:text-primary-500 ${getNavTextStyles(location.pathname === item.href)}`}
               >
                 {item.name}
               </Link>
@@ -70,9 +98,7 @@ const Header = () => {
           <div className="hidden md:flex items-center space-x-4">
             <Link
               to="/login"
-              className={`text-sm font-medium transition-colors hover:text-primary-500 ${
-                isScrolled ? 'text-gray-700' : 'text-white'
-              }`}
+              className={`text-sm font-medium transition-colors hover:text-primary-500 ${getNavTextStyles()}`}
             >
               Log In
             </Link>
@@ -84,9 +110,7 @@ const Header = () => {
           {/* Mobile menu button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className={`md:hidden p-2 rounded-lg transition-colors ${
-              isScrolled ? 'text-gray-700 hover:bg-gray-100' : 'text-white hover:bg-white/10'
-            }`}
+            className={`md:hidden p-2 rounded-lg transition-colors ${getButtonStyles()}`}
           >
             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
