@@ -7,6 +7,10 @@ import Checkout from "./pages/Checkout";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
+import MyDomains from "./pages/MyDomains";
+import DomainDetail from "./pages/DomainDetail";
+import Settings from "./pages/Settings";
+import UserProfile from "./pages/UserProfile";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import Header from "./components/layout/Header";
@@ -50,6 +54,38 @@ const AppRoutes = () => {
 							element={
 								<ProtectedRoute>
 									<Dashboard />
+								</ProtectedRoute>
+							}
+						/>
+						<Route
+							path="/dashboard/domains"
+							element={
+								<ProtectedRoute>
+									<MyDomains />
+								</ProtectedRoute>
+							}
+						/>
+						<Route
+							path="/dashboard/domains/:id"
+							element={
+								<ProtectedRoute>
+									<DomainDetail />
+								</ProtectedRoute>
+							}
+						/>
+						<Route
+							path="/dashboard/settings"
+							element={
+								<ProtectedRoute>
+									<Settings />
+								</ProtectedRoute>
+							}
+						/>
+						<Route
+							path="/dashboard/profile"
+							element={
+								<ProtectedRoute>
+									<UserProfile />
 								</ProtectedRoute>
 							}
 						/>

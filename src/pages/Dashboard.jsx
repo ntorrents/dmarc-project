@@ -1,11 +1,19 @@
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Shield, Users, Globe, BarChart3, Settings, Bell, Plus, CheckCircle, AlertTriangle, XCircle, TrendingUp, Mail, Lock, Eye } from 'lucide-react'
+import { api, APIError } from '../utils/api'
+import AddDomainModal from '../components/modals/AddDomainModal'
 
 const Dashboard = () => {
+  const [domains, setDomains] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [showAddDomain, setShowAddDomain] = useState(false)
+
   const stats = [
     {
       title: 'Protected Domains',
-      value: '3',
+      value: domains.length.toString(),
       icon: Globe,
       color: 'text-blue-600',
       bgColor: 'bg-blue-100',
@@ -37,33 +45,6 @@ const Dashboard = () => {
     }
   ]
 
-  const domains = [
-    {
-      name: 'example.com',
-      status: 'protected',
-      policy: 'quarantine',
-      compliance: 92,
-      lastCheck: '2 hours ago',
-      emails: '1,234'
-    },
-    {
-      name: 'mycompany.org',
-      status: 'warning',
-      policy: 'none',
-      compliance: 67,
-      lastCheck: '1 day ago',
-      emails: '856'
-    },
-    {
-      name: 'business.net',
-      status: 'error',
-      policy: 'none',
-      compliance: 34,
-      lastCheck: '3 days ago',
-      emails: '432'
-    }
-  ]
-
   const recentActivity = [
     {
       type: 'success',
@@ -90,6 +71,100 @@ const Dashboard = () => {
       time: '3 days ago'
     }
   ]
+
+  useEffect(() => {
+    loadDomains()
+  }, [])
+
+  const loadDomains = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      
+      // Check if we're in development mode
+      const isDev = import.meta.env.MODE === 'development'
+      
+      if (isDev) {
+        // Mock data for development
+        setTimeout(() => {
+          setDomains([
+            {
+              id: 1,
+              name: 'example.com',
+              status: 'protected',
+              policy: 'quarantine',
+              compliance: 92,
+              lastCheck: '2 hours ago',
+              emails: '1,234',
+              tag: 'production'
+            },
+            {
+              id: 2,
+              name: 'mycompany.org',
+              status: 'warning',
+              policy: 'none',
+              compliance: 67,
+              lastCheck: '1 day ago',
+              emails: '856',
+              tag: 'staging'
+            },
+            {
+              id: 3,
+              name: 'business.net',
+              status: 'error',
+              policy: 'none',
+              compliance: 34,
+              lastCheck: '3 days ago',
+              emails: '432',
+              tag: 'development'
+            }
+          ])
+          setLoading(false)
+        }, 1000)
+        return
+      }
+      
+      // Production API call
+      const data = await api.domains.list()
+      setDomains(data)
+    } catch (err) {
+      console.error('Error loading domains:', err)
+      setError(err instanceof APIError ? err.message : 'Failed to load domains')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleAddDomain = async (domainData) => {
+    try {
+      const isDev = import.meta.env.MODE === 'development'
+      
+      if (isDev) {
+        // Mock domain creation
+        const newDomain = {
+          id: Date.now(),
+          name: domainData.name,
+          status: 'warning',
+          policy: 'none',
+          compliance: 0,
+          lastCheck: 'Just added',
+          emails: '0',
+          tag: domainData.tag || 'new'
+        }
+        setDomains(prev => [...prev, newDomain])
+        setShowAddDomain(false)
+        return
+      }
+      
+      // Production API call
+      const newDomain = await api.domains.create(domainData)
+      setDomains(prev => [...prev, newDomain])
+      setShowAddDomain(false)
+    } catch (err) {
+      console.error('Error adding domain:', err)
+      throw err
+    }
+  }
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -132,6 +207,17 @@ const Dashboard = () => {
     }
   }
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 pt-20 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading dashboard...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -164,6 +250,23 @@ const Dashboard = () => {
             </div>
           </div>
         </motion.div>
+
+        {/* Error Display */}
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg"
+          >
+            <p className="text-red-800">{error}</p>
+            <button 
+              onClick={loadDomains}
+              className="mt-2 text-sm text-red-600 hover:text-red-800 underline"
+            >
+              Try again
+            </button>
+          </motion.div>
+        )}
 
         {/* Stats Grid */}
         <motion.div
@@ -200,7 +303,10 @@ const Dashboard = () => {
             <div className="card">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-gray-900">Domain Protection Status</h2>
-                <button className="btn-primary">
+                <button 
+                  onClick={() => setShowAddDomain(true)}
+                  className="btn-primary"
+                >
                   <Plus className="w-4 h-4 mr-2" />
                   Add Domain
                 </button>
@@ -208,7 +314,7 @@ const Dashboard = () => {
 
               <div className="space-y-4">
                 {domains.map((domain, index) => (
-                  <div key={domain.name} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                  <div key={domain.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center space-x-3">
                         {getStatusIcon(domain.status)}
@@ -266,7 +372,10 @@ const Dashboard = () => {
             <div className="card">
               <h2 className="text-xl font-bold text-gray-900 mb-4">Quick Actions</h2>
               <div className="space-y-3">
-                <button className="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors group">
+                <button 
+                  onClick={() => setShowAddDomain(true)}
+                  className="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors group"
+                >
                   <div className="flex items-center">
                     <Plus className="w-5 h-5 text-primary-600 mr-3 group-hover:scale-110 transition-transform" />
                     <div>
@@ -333,6 +442,14 @@ const Dashboard = () => {
           </motion.div>
         </div>
       </div>
+
+      {/* Add Domain Modal */}
+      {showAddDomain && (
+        <AddDomainModal
+          onClose={() => setShowAddDomain(false)}
+          onAdd={handleAddDomain}
+        />
+      )}
     </motion.div>
   )
 }
