@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Shield, Users, Globe, BarChart3, Settings, Bell, Plus, CheckCircle, AlertTriangle, XCircle } from 'lucide-react'
+import { Shield, Users, Globe, BarChart3, Settings, Bell, Plus, CheckCircle, AlertTriangle, XCircle, TrendingUp, Mail, Lock, Eye } from 'lucide-react'
 
 const Dashboard = () => {
   const stats = [
@@ -8,28 +8,32 @@ const Dashboard = () => {
       value: '3',
       icon: Globe,
       color: 'text-blue-600',
-      bgColor: 'bg-blue-100'
+      bgColor: 'bg-blue-100',
+      change: '+1 this month'
     },
     {
       title: 'Active Users',
       value: '5',
       icon: Users,
       color: 'text-green-600',
-      bgColor: 'bg-green-100'
+      bgColor: 'bg-green-100',
+      change: '+2 this week'
     },
     {
       title: 'DMARC Compliance',
       value: '87%',
       icon: Shield,
       color: 'text-primary-600',
-      bgColor: 'bg-primary-100'
+      bgColor: 'bg-primary-100',
+      change: '+5% this month'
     },
     {
       title: 'Threats Blocked',
       value: '142',
       icon: BarChart3,
       color: 'text-red-600',
-      bgColor: 'bg-red-100'
+      bgColor: 'bg-red-100',
+      change: '+23 today'
     }
   ]
 
@@ -39,21 +43,51 @@ const Dashboard = () => {
       status: 'protected',
       policy: 'quarantine',
       compliance: 92,
-      lastCheck: '2 hours ago'
+      lastCheck: '2 hours ago',
+      emails: '1,234'
     },
     {
       name: 'mycompany.org',
       status: 'warning',
       policy: 'none',
       compliance: 67,
-      lastCheck: '1 day ago'
+      lastCheck: '1 day ago',
+      emails: '856'
     },
     {
       name: 'business.net',
       status: 'error',
       policy: 'none',
       compliance: 34,
-      lastCheck: '3 days ago'
+      lastCheck: '3 days ago',
+      emails: '432'
+    }
+  ]
+
+  const recentActivity = [
+    {
+      type: 'success',
+      message: 'DMARC policy updated to quarantine',
+      domain: 'example.com',
+      time: '2 hours ago'
+    },
+    {
+      type: 'warning',
+      message: 'SPF record alignment issue detected',
+      domain: 'mycompany.org',
+      time: '1 day ago'
+    },
+    {
+      type: 'info',
+      message: 'New user added to account',
+      domain: 'john@example.com',
+      time: '2 days ago'
+    },
+    {
+      type: 'error',
+      message: 'DKIM signature validation failed',
+      domain: 'business.net',
+      time: '3 days ago'
     }
   ]
 
@@ -83,6 +117,21 @@ const Dashboard = () => {
     }
   }
 
+  const getActivityIcon = (type) => {
+    switch (type) {
+      case 'success':
+        return <CheckCircle className="w-4 h-4 text-green-500" />
+      case 'warning':
+        return <AlertTriangle className="w-4 h-4 text-yellow-500" />
+      case 'error':
+        return <XCircle className="w-4 h-4 text-red-500" />
+      case 'info':
+        return <Users className="w-4 h-4 text-blue-500" />
+      default:
+        return null
+    }
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -92,27 +141,26 @@ const Dashboard = () => {
       className="min-h-screen bg-gray-50 pt-20"
     >
       <div className="container-custom py-8">
-        {/* Header */}
+        {/* Welcome Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           className="mb-8"
         >
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-              <p className="text-gray-600 mt-1">Welcome back! Here's your email security overview.</p>
-            </div>
-            <div className="flex items-center space-x-4">
-              <button className="btn-outline">
-                <Bell className="w-4 h-4 mr-2" />
-                Notifications
-              </button>
-              <button className="btn-primary">
-                <Plus className="w-4 h-4 mr-2" />
-                Add Domain
-              </button>
+          <div className="bg-gradient-primary rounded-xl p-6 text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold mb-2">
+                  Welcome back, {localStorage.getItem('userName') || 'User'}!
+                </h1>
+                <p className="text-primary-100">
+                  Here's your email security overview for today
+                </p>
+              </div>
+              <div className="hidden md:block">
+                <Shield className="w-16 h-16 text-primary-200" />
+              </div>
             </div>
           </div>
         </motion.div>
@@ -125,22 +173,24 @@ const Dashboard = () => {
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
         >
           {stats.map((stat, index) => (
-            <div key={stat.title} className="card">
-              <div className="flex items-center">
-                <div className={`flex items-center justify-center w-12 h-12 ${stat.bgColor} rounded-lg mr-4`}>
+            <div key={stat.title} className="card hover:shadow-xl transition-shadow duration-300">
+              <div className="flex items-center justify-between mb-4">
+                <div className={`flex items-center justify-center w-12 h-12 ${stat.bgColor} rounded-lg`}>
                   <stat.icon className={`w-6 h-6 ${stat.color}`} />
                 </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                  <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-                </div>
+                <TrendingUp className="w-4 h-4 text-green-500" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-600 mb-1">{stat.title}</p>
+                <p className="text-2xl font-bold text-gray-900 mb-1">{stat.value}</p>
+                <p className="text-xs text-green-600">{stat.change}</p>
               </div>
             </div>
           ))}
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Domains List */}
+          {/* Domains Overview */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -149,21 +199,24 @@ const Dashboard = () => {
           >
             <div className="card">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-gray-900">Your Domains</h2>
-                <button className="text-primary-600 hover:text-primary-700 text-sm font-medium">
-                  View All
+                <h2 className="text-xl font-bold text-gray-900">Domain Protection Status</h2>
+                <button className="btn-primary">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Domain
                 </button>
               </div>
 
               <div className="space-y-4">
                 {domains.map((domain, index) => (
                   <div key={domain.name} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center space-x-3">
                         {getStatusIcon(domain.status)}
                         <div>
                           <h3 className="font-semibold text-gray-900">{domain.name}</h3>
-                          <p className="text-sm text-gray-500">Policy: {domain.policy} • Last check: {domain.lastCheck}</p>
+                          <p className="text-sm text-gray-500">
+                            Policy: {domain.policy} • {domain.emails} emails processed
+                          </p>
                         </div>
                       </div>
                       <div className="text-right">
@@ -173,7 +226,12 @@ const Dashboard = () => {
                         <p className="text-sm text-gray-500 mt-1">{domain.compliance}% compliant</p>
                       </div>
                     </div>
-                    <div className="mt-3">
+                    
+                    <div className="mb-3">
+                      <div className="flex justify-between text-sm text-gray-600 mb-1">
+                        <span>Compliance Score</span>
+                        <span>{domain.compliance}%</span>
+                      </div>
                       <div className="w-full bg-gray-200 rounded-full h-2">
                         <div 
                           className={`h-2 rounded-full ${
@@ -184,44 +242,51 @@ const Dashboard = () => {
                         ></div>
                       </div>
                     </div>
+
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-500">Last check: {domain.lastCheck}</span>
+                      <button className="text-primary-600 hover:text-primary-700 font-medium">
+                        View Details →
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
           </motion.div>
 
-          {/* Quick Actions */}
+          {/* Sidebar */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
             className="space-y-6"
           >
-            {/* Quick Actions Card */}
+            {/* Quick Actions */}
             <div className="card">
               <h2 className="text-xl font-bold text-gray-900 mb-4">Quick Actions</h2>
               <div className="space-y-3">
-                <button className="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
+                <button className="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors group">
                   <div className="flex items-center">
-                    <Plus className="w-5 h-5 text-primary-600 mr-3" />
+                    <Plus className="w-5 h-5 text-primary-600 mr-3 group-hover:scale-110 transition-transform" />
                     <div>
                       <p className="font-medium text-gray-900">Add New Domain</p>
                       <p className="text-sm text-gray-500">Protect another domain</p>
                     </div>
                   </div>
                 </button>
-                <button className="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
+                <button className="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors group">
                   <div className="flex items-center">
-                    <BarChart3 className="w-5 h-5 text-primary-600 mr-3" />
+                    <BarChart3 className="w-5 h-5 text-primary-600 mr-3 group-hover:scale-110 transition-transform" />
                     <div>
                       <p className="font-medium text-gray-900">View Reports</p>
                       <p className="text-sm text-gray-500">Detailed analytics</p>
                     </div>
                   </div>
                 </button>
-                <button className="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
+                <button className="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors group">
                   <div className="flex items-center">
-                    <Settings className="w-5 h-5 text-primary-600 mr-3" />
+                    <Settings className="w-5 h-5 text-primary-600 mr-3 group-hover:scale-110 transition-transform" />
                     <div>
                       <p className="font-medium text-gray-900">Account Settings</p>
                       <p className="text-sm text-gray-500">Manage your account</p>
@@ -235,27 +300,34 @@ const Dashboard = () => {
             <div className="card">
               <h2 className="text-xl font-bold text-gray-900 mb-4">Recent Activity</h2>
               <div className="space-y-3">
-                <div className="flex items-start space-x-3">
-                  <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">DMARC policy updated</p>
-                    <p className="text-xs text-gray-500">example.com • 2 hours ago</p>
+                {recentActivity.map((activity, index) => (
+                  <div key={index} className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                    {getActivityIcon(activity.type)}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate">
+                        {activity.message}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {activity.domain} • {activity.time}
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-start space-x-3">
-                  <div className="w-2 h-2 bg-yellow-500 rounded-full mt-2"></div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">SPF record warning</p>
-                    <p className="text-xs text-gray-500">mycompany.org • 1 day ago</p>
-                  </div>
-                </div>
-                <div className="flex items-start space-x-3">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">New user added</p>
-                    <p className="text-xs text-gray-500">john@example.com • 2 days ago</p>
-                  </div>
-                </div>
+                ))}
+              </div>
+              <button className="w-full mt-4 text-sm text-primary-600 hover:text-primary-700 font-medium">
+                View All Activity →
+              </button>
+            </div>
+
+            {/* Security Score */}
+            <div className="card bg-gradient-to-br from-primary-50 to-primary-100 border-primary-200">
+              <div className="text-center">
+                <h3 className="text-lg font-bold text-gray-900 mb-2">Overall Security Score</h3>
+                <div className="text-4xl font-bold text-primary-600 mb-2">87/100</div>
+                <p className="text-sm text-gray-600 mb-4">Good security posture</p>
+                <button className="btn-primary w-full">
+                  Improve Score
+                </button>
               </div>
             </div>
           </motion.div>

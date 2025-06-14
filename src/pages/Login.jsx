@@ -39,7 +39,10 @@ const Login = () => {
 				return;
 			}
 
+			// Store user info for dashboard
 			localStorage.setItem("token", "fake-dev-token");
+			localStorage.setItem("userName", formData.email.split('@')[0]);
+			localStorage.setItem("userEmail", formData.email);
 			navigate("/dashboard");
 			setIsLoading(false);
 			return;
@@ -61,6 +64,8 @@ const Login = () => {
 
 		if (res.ok) {
 			localStorage.setItem("token", data.access); // guarda el token real
+			localStorage.setItem("userName", data.user?.name || formData.email.split('@')[0]);
+			localStorage.setItem("userEmail", formData.email);
 			navigate("/dashboard");
 		} else {
 			alert(data.detail || "Error en login");
