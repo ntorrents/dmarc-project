@@ -25,6 +25,27 @@ const Login = () => {
 		e.preventDefault();
 		setIsLoading(true);
 
+		// Detectar entorno de desarrollo
+		const isDev =
+			import.meta.env.DEV || window.location.hostname !== "127.0.0.1";
+
+		if (isDev) {
+			// 🔧 Simulación de login en entorno sandbox o desarrollo sin backend
+			console.warn("Simulación de login en entorno de desarrollo");
+
+			if (!formData.email || !formData.password) {
+				alert("Por favor completa los campos");
+				setIsLoading(false);
+				return;
+			}
+
+			localStorage.setItem("token", "fake-dev-token");
+			navigate("/dashboard");
+			setIsLoading(false);
+			return;
+		}
+
+		// 🟢 Producción / entorno local real con backend activo
 		const res = await fetch("http://127.0.0.1:8000/auth/login/", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
@@ -39,8 +60,7 @@ const Login = () => {
 		setIsLoading(false);
 
 		if (res.ok) {
-			// Login correcto, redirigimos
-			localStorage.setItem("token", data.access); // guarda el token
+			localStorage.setItem("token", data.access); // guarda el token real
 			navigate("/dashboard");
 		} else {
 			alert(data.detail || "Error en login");
