@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Globe, Tag, FileText } from 'lucide-react'
-import { validateDomain, sanitizeInput } from '../../utils/api'
+import { validateDomain, sanitizeInput } from '../../lib/helpers'
 
 const AddDomainModal = ({ onClose, onAdd }) => {
   const [formData, setFormData] = useState({

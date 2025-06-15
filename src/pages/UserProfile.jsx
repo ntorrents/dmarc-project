@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { User, Mail, Lock, Building, Save, Eye, EyeOff, Shield } from 'lucide-react'
-import { api, APIError, validateEmail, sanitizeInput } from '../utils/api'
+import { api as authApi } from '../lib/api/auth'
+import { api as companyApi } from '../lib/api/companies'
+import { APIError, validateEmail, sanitizeInput } from '../lib/helpers'
 
 const UserProfile = () => {
   const [profile, setProfile] = useState({
@@ -65,8 +67,8 @@ const UserProfile = () => {
       
       // Production API calls
       const [profileData, orgData] = await Promise.all([
-        api.auth.profile.get(),
-        api.organization.get().catch(() => null) // Only admins can access this
+        authApi.getProfile(),
+        companyApi.get().catch(() => null) // Only admins can access this
       ])
       
       setProfile({
@@ -172,7 +174,7 @@ const UserProfile = () => {
         updateData.password = profile.newPassword
       }
       
-      await api.auth.profile.update(updateData)
+      await authApi.updateProfile(updateData)
       
       setSuccess('Profile updated successfully!')
       
@@ -216,7 +218,7 @@ const UserProfile = () => {
       }
       
       // Production API call
-      await api.organization.update(organization)
+      await companyApi.update(organization)
       setSuccess('Organization settings updated successfully!')
     } catch (err) {
       console.error('Error saving organization:', err)

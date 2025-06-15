@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Users, Shield, Save, Plus, Trash2, Edit3, Check, X } from 'lucide-react'
-import { api, APIError, validateEmail, sanitizeInput } from '../utils/api'
+import { api } from '../lib/api/users'
+import { APIError, validateEmail, sanitizeInput } from '../lib/helpers'
 
 const Settings = () => {
   const [users, setUsers] = useState([])
@@ -56,7 +57,7 @@ const Settings = () => {
         return
       }
       
-      const data = await api.users.list()
+      const data = await api.list()
       setUsers(data)
     } catch (err) {
       console.error('Error loading users:', err)
@@ -94,7 +95,7 @@ const Settings = () => {
         return
       }
 
-      await api.users.update(editingUser.id, {
+      await api.update(editingUser.id, {
         name: sanitizeInput(editingUser.name),
         email: sanitizeInput(editingUser.email),
         role: editingUser.role
@@ -142,7 +143,7 @@ const Settings = () => {
         return
       }
 
-      const user = await api.users.create({
+      const user = await api.create({
         name: sanitizeInput(newUser.name),
         email: sanitizeInput(newUser.email),
         role: newUser.role
@@ -172,7 +173,7 @@ const Settings = () => {
         return
       }
 
-      await api.users.delete(userId)
+      await api.delete(userId)
       setUsers(prev => prev.filter(user => user.id !== userId))
     } catch (err) {
       console.error('Error deleting user:', err)

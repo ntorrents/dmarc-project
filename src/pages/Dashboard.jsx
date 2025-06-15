@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Shield, Users, Globe, BarChart3, Settings, Bell, Plus, CheckCircle, AlertTriangle, XCircle, TrendingUp, Mail, Lock, Eye } from 'lucide-react'
-import { api, APIError } from '../utils/api'
+import { api } from '../lib/api/domains'
+import { APIError } from '../lib/helpers'
 import AddDomainModal from '../components/modals/AddDomainModal'
 
 const Dashboard = () => {
@@ -125,7 +126,7 @@ const Dashboard = () => {
       }
       
       // Production API call
-      const data = await api.domains.list()
+      const data = await api.list()
       setDomains(data)
     } catch (err) {
       console.error('Error loading domains:', err)
@@ -157,7 +158,7 @@ const Dashboard = () => {
       }
       
       // Production API call
-      const newDomain = await api.domains.create(domainData)
+      const newDomain = await api.create(domainData)
       setDomains(prev => [...prev, newDomain])
       setShowAddDomain(false)
     } catch (err) {

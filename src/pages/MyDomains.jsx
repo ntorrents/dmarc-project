@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Search, Filter, Plus, Globe, Tag, Calendar, Shield, AlertTriangle, CheckCircle, XCircle, BarChart3 } from 'lucide-react'
-import { api, APIError } from '../utils/api'
+import { api, APIError } from '../lib/api/domains'
+import { validateEmail, sanitizeInput } from '../lib/helpers'
 import AddDomainModal from '../components/modals/AddDomainModal'
 import { Link } from 'react-router-dom'
 
@@ -111,7 +112,7 @@ const MyDomains = () => {
         return
       }
       
-      const data = await api.domains.list()
+      const data = await api.list()
       setDomains(data)
     } catch (err) {
       console.error('Error loading domains:', err)
@@ -220,7 +221,7 @@ const MyDomains = () => {
         return
       }
       
-      const newDomain = await api.domains.create(domainData)
+      const newDomain = await api.create(domainData)
       setDomains(prev => [...prev, newDomain])
       setShowAddDomain(false)
     } catch (err) {

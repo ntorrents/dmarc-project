@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { ArrowLeft, Shield, Mail, Lock, BarChart3, Calendar, Globe, AlertTriangle, CheckCircle, XCircle, TrendingUp, TrendingDown } from 'lucide-react'
-import { api, APIError } from '../utils/api'
+import { api } from '../lib/api/domains'
+import { APIError } from '../lib/helpers'
 import { Line } from 'react-chartjs-2'
 import {
   Chart as ChartJS,
@@ -98,8 +99,8 @@ const DomainDetail = () => {
       
       // Production API calls
       const [domainData, statsData] = await Promise.all([
-        api.domains.get(id),
-        api.domains.stats(id)
+        api.get(id),
+        api.getStats(id)
       ])
       
       setDomain(domainData)
