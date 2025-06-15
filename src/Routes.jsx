@@ -20,20 +20,23 @@ import DashboardFooter from "./components/layout/DashboardFooter";
 import ScrollToTop from "./utils/ScrollToTop";
 import ProtectedRoute from "./ProtectedRoute";
 import { useLocation } from "react-router-dom";
+import PropTypes from "prop-types";
 
 const AppLayout = ({ children }) => {
 	const location = useLocation();
-	const isDashboard = location.pathname.startsWith('/dashboard');
+	const isDashboard = location.pathname.startsWith("/dashboard");
 
 	return (
 		<div className="min-h-screen flex flex-col">
 			{isDashboard ? <DashboardHeader /> : <Header />}
-			<main className="flex-grow">
-				{children}
-			</main>
+			<main className="flex-grow">{children}</main>
 			{isDashboard ? <DashboardFooter /> : <Footer />}
 		</div>
 	);
+};
+
+AppLayout.propTypes = {
+	children: PropTypes.node.isRequired,
 };
 
 const AppRoutes = () => {

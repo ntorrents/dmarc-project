@@ -1,4 +1,5 @@
 import { Navigate } from "react-router-dom";
+import PropTypes from "prop-types";
 
 const ProtectedRoute = ({ children }) => {
 	const isDev = import.meta.env.MODE === "development"; // Vite (o similar) usa esto
@@ -15,6 +16,10 @@ const ProtectedRoute = ({ children }) => {
 	}
 
 	return children;
+};
+
+ProtectedRoute.propTypes = {
+	children: PropTypes.node.isRequired,
 };
 
 export default ProtectedRoute;
