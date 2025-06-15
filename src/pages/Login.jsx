@@ -25,50 +25,60 @@ const Login = () => {
 		e.preventDefault();
 		setIsLoading(true);
 
-		// Detectar entorno de desarrollo
-		const isDev =
-			import.meta.env.DEV || window.location.hostname !== "127.0.0.1";
+		// const isDev =
+		// 	import.meta.env.DEV || window.location.hostname !== "127.0.0.1";
 
-		if (isDev) {
-			// 🔧 Simulación de login en entorno sandbox o desarrollo sin backend
-			console.warn("Simulación de login en entorno de desarrollo");
+		// if (isDev) {
+		// 	// 🔧 Simulación de login en entorno sandbox o desarrollo sin backend
+		// 	console.warn("Simulación de login en entorno de desarrollo");
 
-			if (!formData.email || !formData.password) {
-				alert("Por favor completa los campos");
-				setIsLoading(false);
-				return;
+		// 	if (!formData.email || !formData.password) {
+		// 		alert("Por favor completa los campos");
+		// 		setIsLoading(false);
+		// 		return;
+		// 	}
+
+		// 	// ⚠️ Solo para pruebas. No guardar nunca tokens así en producción.
+		// 	localStorage.setItem("token", "fake-dev-token");
+		// 	localStorage.setItem("userName", formData.email.split("@")[0]);
+		// 	localStorage.setItem("userEmail", formData.email);
+
+		// 	navigate("/dashboard");
+		// 	setIsLoading(false);
+		// 	return;
+		// }
+
+		try {
+			// 🟢 Entorno real: usamos cookies HttpOnly
+			const res = await fetch("http://127.0.0.1:8000/auth/login/", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					email: formData.email,
+					password: formData.password,
+				}),
+				credentials: "include", // ✅ MUY IMPORTANTE para HttpOnly cookies
+			});
+
+			const data = await res.json();
+
+			if (res.ok) {
+				// Opcional: guardar datos del usuario si los necesitas en la UI
+				// pero NUNCA el token si es HttpOnly
+				// localStorage.setItem("userName", data.user.username);
+				// localStorage.setItem("userEmail", data.user.email);
+
+				navigate("/dashboard");
+			} else {
+				alert(data.detail || "Error en login");
 			}
-
-			// Store user info for dashboard
-			localStorage.setItem("token", "fake-dev-token");
-			localStorage.setItem("userName", formData.email.split('@')[0]);
-			localStorage.setItem("userEmail", formData.email);
-			navigate("/dashboard");
+		} catch (error) {
+			console.error("Error en login:", error);
+			alert("Fallo en la conexión con el servidor");
+		} finally {
 			setIsLoading(false);
-			return;
-		}
-
-		// 🟢 Producción / entorno local real con backend activo
-		const res = await fetch("http://127.0.0.1:8000/auth/login/", {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({
-				email: formData.email,
-				password: formData.password,
-			}),
-		});
-
-		const data = await res.json();
-
-		setIsLoading(false);
-
-		if (res.ok) {
-			localStorage.setItem("token", data.access); // guarda el token real
-			localStorage.setItem("userName", data.user?.name || formData.email.split('@')[0]);
-			localStorage.setItem("userEmail", formData.email);
-			navigate("/dashboard");
-		} else {
-			alert(data.detail || "Error en login");
 		}
 	};
 

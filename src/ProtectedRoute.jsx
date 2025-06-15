@@ -1,17 +1,16 @@
 import { Navigate } from "react-router-dom";
 import PropTypes from "prop-types";
+import { useAuthContext } from "./context/AuthContext";
 
 const ProtectedRoute = ({ children }) => {
-	const isDev = import.meta.env.MODE === "development"; // Vite (o similar) usa esto
+	const { isAuthenticated, loading } = useAuthContext();
 
-	if (isDev) {
-		// ⚠️ EN DESARROLLO: permitir acceso sin token
-		return children;
+	if (loading) {
+		// Puedes reemplazar esto por un spinner bonito si quieres
+		return <div>Cargando...</div>;
 	}
 
-	// ✅ EN PRODUCCIÓN: exigir autenticación
-	const token = localStorage.getItem("token");
-	if (!token) {
+	if (!isAuthenticated) {
 		return <Navigate to="/login" replace />;
 	}
 
