@@ -12,7 +12,7 @@ import {
 	X,
 	ChevronDown,
 } from "lucide-react";
-import { useAuthContext } from "@/context/AuthContext";
+import { useAuthContext } from "@/context/AuthContext.tsx";
 import { toast } from "react-toastify";
 import { authAPI } from "@/lib/api/auth";
 
