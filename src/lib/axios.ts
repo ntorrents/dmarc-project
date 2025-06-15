@@ -19,9 +19,17 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.response.use(
 	(response) => response,
 	(error) => {
+		// Don't redirect on network errors - let components handle them
+		if (error.code === 'ERR_NETWORK' || error.message === 'Network Error') {
+			console.error('Network error - backend may not be running:', error);
+			return Promise.reject(error);
+		}
+		
 		if (error.response?.status === 401) {
-			// Redirigir al login si el token ha expirado o no está presente
-			window.location.href = "/login";
+			// Only redirect to login if we're not already on the login page
+			if (!window.location.pathname.includes('/login')) {
+				window.location.href = "/login";
+			}
 		}
 		return Promise.reject(error);
 	}

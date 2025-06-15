@@ -18,10 +18,22 @@ export const useAuth = () => {
 	const checkAuthStatus = async () => {
 		try {
 			setLoading(true);
+			setError(null);
 			const profile = await authAPI.getProfile(); // 🍪 Usa la cookie HttpOnly
 			setUser(profile);
 		} catch (error) {
 			console.error("Auth check failed:", error);
+			
+			// Check if it's a network error
+			if (error.code === 'ERR_NETWORK' || error.message === 'Network Error') {
+				setError("Unable to connect to server. Please check if the backend is running.");
+			} else if (error.response?.status === 401) {
+				// Unauthorized - user not logged in, this is expected
+				setError(null);
+			} else {
+				setError(getErrorMessage(error));
+			}
+			
 			setUser(null); // No sesión válida
 		} finally {
 			setLoading(false);
