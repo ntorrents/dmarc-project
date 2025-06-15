@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { User, Mail, Lock, Building, Save, Eye, EyeOff, Shield } from 'lucide-react'
-import { api as authApi } from '../lib/api/auth'
-import { api as companyApi } from '../lib/api/companies'
-import { APIError, validateEmail, sanitizeInput } from '../lib/helpers'
+import { authAPI } from '../lib/api/auth'
+import { companiesAPI } from '../lib/api/companies'
+import { validateEmail, sanitizeInput, getErrorMessage } from '../lib/helpers'
 
 const UserProfile = () => {
   const [profile, setProfile] = useState({
@@ -67,8 +67,8 @@ const UserProfile = () => {
       
       // Production API calls
       const [profileData, orgData] = await Promise.all([
-        authApi.getProfile(),
-        companyApi.get().catch(() => null) // Only admins can access this
+        authAPI.getProfile(),
+        companiesAPI.get().catch(() => null) // Only admins can access this
       ])
       
       setProfile({
@@ -85,7 +85,7 @@ const UserProfile = () => {
       }
     } catch (err) {
       console.error('Error loading profile:', err)
-      setError(err instanceof APIError ? err.message : 'Failed to load profile')
+      setError(getErrorMessage(err))
     } finally {
       setLoading(false)
     }
@@ -174,7 +174,7 @@ const UserProfile = () => {
         updateData.password = profile.newPassword
       }
       
-      await authApi.updateProfile(updateData)
+      await authAPI.updateProfile(updateData)
       
       setSuccess('Profile updated successfully!')
       
@@ -187,7 +187,7 @@ const UserProfile = () => {
       }))
     } catch (err) {
       console.error('Error saving profile:', err)
-      setError(err instanceof APIError ? err.message : 'Failed to update profile')
+      setError(getErrorMessage(err))
     } finally {
       setSaving(false)
     }
@@ -218,11 +218,11 @@ const UserProfile = () => {
       }
       
       // Production API call
-      await companyApi.update(organization)
+      await companiesAPI.update(organization)
       setSuccess('Organization settings updated successfully!')
     } catch (err) {
       console.error('Error saving organization:', err)
-      setError(err instanceof APIError ? err.message : 'Failed to update organization settings')
+      setError(getErrorMessage(err))
     } finally {
       setSaving(false)
     }

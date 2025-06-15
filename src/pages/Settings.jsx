@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Users, Shield, Save, Plus, Trash2, Edit3, Check, X } from 'lucide-react'
-import { api } from '../lib/api/users'
-import { APIError, validateEmail, sanitizeInput } from '../lib/helpers'
+import { usersAPI } from '../lib/api/users'
+import { validateEmail, sanitizeInput, getErrorMessage } from '../lib/helpers'
 
 const Settings = () => {
   const [users, setUsers] = useState([])
@@ -57,11 +57,11 @@ const Settings = () => {
         return
       }
       
-      const data = await api.list()
+      const data = await usersAPI.list()
       setUsers(data)
     } catch (err) {
       console.error('Error loading users:', err)
-      setError(err instanceof APIError ? err.message : 'Failed to load users')
+      setError(getErrorMessage(err))
     } finally {
       setLoading(false)
     }
@@ -95,7 +95,7 @@ const Settings = () => {
         return
       }
 
-      await api.update(editingUser.id, {
+      await usersAPI.update(editingUser.id, {
         name: sanitizeInput(editingUser.name),
         email: sanitizeInput(editingUser.email),
         role: editingUser.role
@@ -108,7 +108,7 @@ const Settings = () => {
       setError(null)
     } catch (err) {
       console.error('Error updating user:', err)
-      setError(err instanceof APIError ? err.message : 'Failed to update user')
+      setError(getErrorMessage(err))
     }
   }
 
@@ -143,7 +143,7 @@ const Settings = () => {
         return
       }
 
-      const user = await api.create({
+      const user = await usersAPI.create({
         name: sanitizeInput(newUser.name),
         email: sanitizeInput(newUser.email),
         role: newUser.role
@@ -155,7 +155,7 @@ const Settings = () => {
       setError(null)
     } catch (err) {
       console.error('Error adding user:', err)
-      setError(err instanceof APIError ? err.message : 'Failed to add user')
+      setError(getErrorMessage(err))
     }
   }
 
@@ -173,11 +173,11 @@ const Settings = () => {
         return
       }
 
-      await api.delete(userId)
+      await usersAPI.delete(userId)
       setUsers(prev => prev.filter(user => user.id !== userId))
     } catch (err) {
       console.error('Error deleting user:', err)
-      setError(err instanceof APIError ? err.message : 'Failed to delete user')
+      setError(getErrorMessage(err))
     }
   }
 

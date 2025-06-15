@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { ArrowLeft, Shield, Mail, Lock, BarChart3, Calendar, Globe, AlertTriangle, CheckCircle, XCircle, TrendingUp, TrendingDown } from 'lucide-react'
-import { api } from '../lib/api/domains'
-import { APIError } from '../lib/helpers'
+import { domainsAPI } from '../lib/api/domains'
+import { getErrorMessage } from '../lib/helpers'
 import { Line } from 'react-chartjs-2'
 import {
   Chart as ChartJS,
@@ -99,15 +99,15 @@ const DomainDetail = () => {
       
       // Production API calls
       const [domainData, statsData] = await Promise.all([
-        api.get(id),
-        api.getStats(id)
+        domainsAPI.get(id),
+        domainsAPI.getStats(id)
       ])
       
       setDomain(domainData)
       setStats(statsData)
     } catch (err) {
       console.error('Error loading domain data:', err)
-      setError(err instanceof APIError ? err.message : 'Failed to load domain data')
+      setError(getErrorMessage(err))
     } finally {
       setLoading(false)
     }
