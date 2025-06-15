@@ -108,7 +108,7 @@ const Pricing = () => {
           viewport={{ once: true }}
           className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto"
         >
-          {plans.map((plan, index) => (
+          {plans.map((plan) => (
             <motion.div
               key={plan.name}
               variants={itemVariants}
