@@ -3,15 +3,18 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import AppRoutes from "./Routes";
 import { AuthProvider } from "./context/AuthContext";
+import { NotificationProvider } from "./context/NotificationContext";
 
 const rootElement = document.getElementById("root");
 
 if (rootElement) {
 	createRoot(rootElement).render(
 		<StrictMode>
-			<AuthProvider>
-				<AppRoutes />
-			</AuthProvider>
+			<NotificationProvider>
+				<AuthProvider>
+					<AppRoutes />
+				</AuthProvider>
+			</NotificationProvider>
 		</StrictMode>
 	);
 } else {
