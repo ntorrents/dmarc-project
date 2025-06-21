@@ -12,9 +12,7 @@ import {
 	X,
 	ChevronDown,
 } from "lucide-react";
-import { useAuthContext } from "@/context/AuthContext.tsx";
-import { toast } from "react-toastify";
-import { authAPI } from "@/lib/api/auth";
+import { useAuthContext } from "../context/AuthContext";
 
 const DashboardHeader = () => {
 	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -23,21 +21,22 @@ const DashboardHeader = () => {
 	const location = useLocation();
 
 	const { user, logout } = useAuthContext();
-	const userName = user?.name || "John Doe";
-	const userEmail = user?.email || "john@example.com";
+	
+	// Use mock data in development if user is not available
+	const isDev = import.meta.env.MODE === "development";
+	const userName = user?.name || (isDev ? "Dev User" : "John Doe");
+	const userEmail = user?.email || (isDev ? "dev@example.com" : "john@example.com");
 
 	const handleLogout = async () => {
 		try {
-			await authAPI.logout(); // llamada al backend para invalidar sesión
-			toast.success("Logged out successfully");
+			await logout();
+			navigate("/login");
 		} catch (error) {
 			console.error("Logout failed:", error);
-			toast.error("Logout failed. Please try again.");
-		} finally {
-			localStorage.removeItem("token");
-			localStorage.removeItem("userName");
-			localStorage.removeItem("userEmail");
-			navigate("/login");
+			// In development, still navigate to login even if logout fails
+			if (isDev) {
+				navigate("/login");
+			}
 		}
 	};
 
@@ -52,7 +51,7 @@ const DashboardHeader = () => {
 		{ name: "Settings", href: "/dashboard/settings", icon: Settings },
 	];
 
-	const isActiveRoute = (href) => {
+	const isActiveRoute = (href: string) => {
 		if (href === "/dashboard") {
 			return location.pathname === "/dashboard";
 		}

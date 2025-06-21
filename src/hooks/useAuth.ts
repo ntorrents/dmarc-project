@@ -19,7 +19,25 @@ export const useAuth = () => {
 		try {
 			setLoading(true);
 			setError(null);
-			const profile = await authAPI.getProfile(); // 🍪 Usa la cookie HttpOnly
+
+			// In development mode, create a mock user to bypass authentication
+			const isDev = import.meta.env.MODE === "development";
+			
+			if (isDev) {
+				// Create a mock user for development
+				const mockUser: UserProfile = {
+					id: 1,
+					name: "Dev User",
+					email: "dev@example.com",
+					role: "admin"
+				};
+				setUser(mockUser);
+				setLoading(false);
+				return;
+			}
+
+			// Production mode - use real authentication
+			const profile = await authAPI.getProfile();
 			setUser(profile);
 		} catch (error) {
 			console.error("Auth check failed:", error);
@@ -34,7 +52,7 @@ export const useAuth = () => {
 				setError(getErrorMessage(error));
 			}
 			
-			setUser(null); // No sesión válida
+			setUser(null);
 		} finally {
 			setLoading(false);
 		}
@@ -45,9 +63,22 @@ export const useAuth = () => {
 			setError(null);
 			setLoading(true);
 
-			const response = await authAPI.login(credentials); // 🍪 No devuelve token, solo éxito
+			// In development mode, simulate successful login
+			const isDev = import.meta.env.MODE === "development";
+			
+			if (isDev) {
+				const mockUser: UserProfile = {
+					id: 1,
+					name: credentials.email.split('@')[0] || "Dev User",
+					email: credentials.email,
+					role: "admin"
+				};
+				setUser(mockUser);
+				return mockUser;
+			}
 
-			// Opcional: obtener el perfil tras login
+			// Production mode - use real authentication
+			const response = await authAPI.login(credentials);
 			const profile = await authAPI.getProfile();
 			setUser(profile);
 
@@ -64,14 +95,20 @@ export const useAuth = () => {
 	const logout = async () => {
 		try {
 			setLoading(true);
-			await authAPI.logout(); // elimina cookie HttpOnly en backend
+			
+			// In development mode, just clear the user
+			const isDev = import.meta.env.MODE === "development";
+			
+			if (!isDev) {
+				await authAPI.logout();
+			}
 		} catch (error) {
 			console.error("Logout error:", error);
 		} finally {
 			setUser(null);
 			setLoading(false);
 
-			// Limpieza localStorage para que no queden datos residuales
+			// Clear localStorage
 			localStorage.removeItem("token");
 			localStorage.removeItem("userName");
 			localStorage.removeItem("userEmail");
@@ -81,6 +118,17 @@ export const useAuth = () => {
 	const updateProfile = async (data: any) => {
 		try {
 			setError(null);
+			
+			// In development mode, just update the mock user
+			const isDev = import.meta.env.MODE === "development";
+			
+			if (isDev) {
+				const updatedUser = { ...user, ...data } as UserProfile;
+				setUser(updatedUser);
+				return updatedUser;
+			}
+
+			// Production mode - use real API
 			const updatedUser = await authAPI.updateProfile(data);
 			setUser(updatedUser);
 			return updatedUser;
