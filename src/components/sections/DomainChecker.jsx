@@ -1,35 +1,50 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, CheckCircle, XCircle, AlertCircle, Loader2, X, Shield, Mail, Lock, TrendingUp, AlertTriangle } from 'lucide-react'
-import { checkDMARC } from '../../utils/dmarcChecker'
-import { calculateEmailSecurityScore } from '../../utils/emailSecurityScorer'
+import { Search, CheckCircle, XCircle, AlertCircle, Loader2, X, Shield, Mail, Lock, TrendingUp, AlertTriangle, Globe, Clock, Zap } from 'lucide-react'
+import { checkEmailSecurity } from '../../utils/dnsResolver'
+import { calculateEmailSecurityScore, generateActionPlan } from '../../utils/emailSecurityScorer'
+import { validateDomain } from '../../lib/helpers'
 
 const DomainChecker = () => {
   const [domain, setDomain] = useState('')
   const [result, setResult] = useState(null)
   const [securityScore, setSecurityScore] = useState(null)
+  const [actionPlan, setActionPlan] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!domain.trim()) return
 
+    // Validate domain format
+    if (!validateDomain(domain.trim())) {
+      setError('Please enter a valid domain name (e.g., example.com)')
+      return
+    }
+
     setIsLoading(true)
     setResult(null)
     setSecurityScore(null)
+    setActionPlan(null)
+    setError('')
 
     try {
-      const analysisResult = await checkDMARC(domain.trim())
-      setResult(analysisResult)
+      // Perform real DNS checks
+      const emailSecurityData = await checkEmailSecurity(domain.trim())
       
-      // Calculate security score
-      const scoreData = calculateEmailSecurityScore(analysisResult)
+      // Calculate comprehensive security score
+      const scoreData = calculateEmailSecurityScore(emailSecurityData)
+      
+      // Generate action plan
+      const actions = generateActionPlan(scoreData)
+
+      setResult(emailSecurityData)
       setSecurityScore(scoreData)
+      setActionPlan(actions)
     } catch (error) {
-      setResult({
-        status: 'error',
-        message: 'Failed to analyze domain. Please try again.',
-      })
+      console.error('Domain analysis failed:', error)
+      setError(error.message || 'Failed to analyze domain. Please try again.')
     } finally {
       setIsLoading(false)
     }
@@ -38,32 +53,8 @@ const DomainChecker = () => {
   const closeResult = () => {
     setResult(null)
     setSecurityScore(null)
-  }
-
-  const getResultIcon = () => {
-    switch (result?.status) {
-      case 'success':
-        return <CheckCircle className="w-6 h-6 text-green-500" />
-      case 'warning':
-        return <AlertCircle className="w-6 h-6 text-yellow-500" />
-      case 'error':
-        return <XCircle className="w-6 h-6 text-red-500" />
-      default:
-        return null
-    }
-  }
-
-  const getResultStyles = () => {
-    switch (result?.status) {
-      case 'success':
-        return 'bg-green-50 border-green-200 text-green-800'
-      case 'warning':
-        return 'bg-yellow-50 border-yellow-200 text-yellow-800'
-      case 'error':
-        return 'bg-red-50 border-red-200 text-red-800'
-      default:
-        return 'bg-gray-50 border-gray-200 text-gray-800'
-    }
+    setActionPlan(null)
+    setError('')
   }
 
   const getScoreColor = (score) => {
@@ -102,6 +93,21 @@ const DomainChecker = () => {
     }
   }
 
+  const getPriorityColor = (priority) => {
+    switch (priority) {
+      case 'critical':
+        return 'bg-red-100 text-red-800 border-red-200'
+      case 'high':
+        return 'bg-orange-100 text-orange-800 border-orange-200'
+      case 'medium':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200'
+      case 'low':
+        return 'bg-blue-100 text-blue-800 border-blue-200'
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200'
+    }
+  }
+
   return (
     <section className="section-padding bg-white">
       <div className="container-custom">
@@ -113,11 +119,11 @@ const DomainChecker = () => {
           className="text-center mb-12"
         >
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            DMARC Record Checker
+            Advanced DMARC Security Analyzer
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Enter your domain to get an instant analysis of your current DMARC configuration 
-            and receive recommendations for improvement.
+            Get a comprehensive real-time analysis of your domain's email security configuration 
+            with DNS validation and expert recommendations.
           </p>
         </motion.div>
 
@@ -144,7 +150,7 @@ const DomainChecker = () => {
               <button
                 type="submit"
                 disabled={isLoading || !domain.trim()}
-                className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed min-w-[120px]"
+                className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed min-w-[140px]"
               >
                 {isLoading ? (
                   <>
@@ -152,13 +158,32 @@ const DomainChecker = () => {
                     Analyzing...
                   </>
                 ) : (
-                  'Analyze Domain'
+                  <>
+                    <Zap className="w-5 h-5 mr-2" />
+                    Analyze Domain
+                  </>
                 )}
               </button>
             </div>
           </form>
 
-          {/* Enhanced Results with Security Score */}
+          {/* Error Display */}
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: -20 }}
+              transition={{ duration: 0.3 }}
+              className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg"
+            >
+              <div className="flex items-center">
+                <XCircle className="w-5 h-5 text-red-500 mr-3" />
+                <p className="text-red-800">{error}</p>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Enhanced Results with Real DNS Data */}
           <AnimatePresence>
             {result && securityScore && (
               <motion.div
@@ -179,7 +204,7 @@ const DomainChecker = () => {
                   
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold">
-                      Risk Assessment Level: {securityScore.riskLevel}
+                      Security Risk Level: {securityScore.riskLevel}
                     </h3>
                     <div className="flex items-center space-x-2">
                       <span className="text-sm font-medium">Grade:</span>
@@ -187,17 +212,20 @@ const DomainChecker = () => {
                     </div>
                   </div>
                   
-                  <p className="text-sm leading-relaxed">
-                    {securityScore.riskLevel === 'Low' && 
-                      'Domains with a low security risk level have minimal or no significant authentication issues, ensuring robust protection against email-based threats, but periodic monitoring is advisable to stay ahead of emerging risks.'
-                    }
-                    {securityScore.riskLevel === 'Medium' && 
-                      'Domains with medium risk have some authentication gaps that should be addressed to improve email security. While basic protection is in place, there are opportunities for enhancement.'
-                    }
-                    {securityScore.riskLevel === 'High' && 
-                      'Domains with high security risk have significant authentication issues that require immediate attention. Your domain is vulnerable to spoofing and phishing attacks.'
-                    }
+                  <p className="text-sm leading-relaxed mb-4">
+                    {securityScore.summary}
                   </p>
+
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center space-x-2">
+                      <Clock className="w-4 h-4" />
+                      <span>Analyzed: {new Date(securityScore.timestamp).toLocaleString()}</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Globe className="w-4 h-4" />
+                      <span>Real-time DNS validation</span>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Overall Score and Breakdown */}
@@ -215,7 +243,7 @@ const DomainChecker = () => {
                   </div>
 
                   {/* Score Breakdown */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                     {/* DMARC */}
                     <div className="bg-gray-50 rounded-lg p-4">
                       <div className="flex items-center justify-between mb-3">
@@ -227,12 +255,20 @@ const DomainChecker = () => {
                       </div>
                       <div className="mb-2">
                         <div className={`text-2xl font-bold ${getScoreColor(securityScore.breakdown.dmarc.score)}`}>
-                          {securityScore.breakdown.dmarc.score}/40
+                          {securityScore.breakdown.dmarc.score}/{securityScore.breakdown.dmarc.maxScore}
                         </div>
                         <div className="text-sm text-gray-600">
                           Domain-based Message Authentication
                         </div>
                       </div>
+                      {result.dmarc.found && securityScore.breakdown.dmarc.details && (
+                        <div className="text-xs text-gray-600 mt-2">
+                          Policy: {securityScore.breakdown.dmarc.details.policy || 'none'}
+                          {securityScore.breakdown.dmarc.details.percentage !== 100 && (
+                            <span> ({securityScore.breakdown.dmarc.details.percentage}%)</span>
+                          )}
+                        </div>
+                      )}
                       {securityScore.breakdown.dmarc.issues.length > 0 && (
                         <div className="text-xs text-red-600 mt-2">
                           {securityScore.breakdown.dmarc.issues[0]}
@@ -251,12 +287,18 @@ const DomainChecker = () => {
                       </div>
                       <div className="mb-2">
                         <div className={`text-2xl font-bold ${getScoreColor(securityScore.breakdown.spf.score)}`}>
-                          {securityScore.breakdown.spf.score}/30
+                          {securityScore.breakdown.spf.score}/{securityScore.breakdown.spf.maxScore}
                         </div>
                         <div className="text-sm text-gray-600">
                           Sender Policy Framework
                         </div>
                       </div>
+                      {result.spf.found && securityScore.breakdown.spf.details && (
+                        <div className="text-xs text-gray-600 mt-2">
+                          Policy: {securityScore.breakdown.spf.details.finalQualifier === '-' ? 'Strict' : 
+                                   securityScore.breakdown.spf.details.finalQualifier === '~' ? 'Soft Fail' : 'Permissive'}
+                        </div>
+                      )}
                       {securityScore.breakdown.spf.issues.length > 0 && (
                         <div className="text-xs text-orange-600 mt-2">
                           {securityScore.breakdown.spf.issues[0]}
@@ -275,12 +317,20 @@ const DomainChecker = () => {
                       </div>
                       <div className="mb-2">
                         <div className={`text-2xl font-bold ${getScoreColor(securityScore.breakdown.dkim.score)}`}>
-                          {securityScore.breakdown.dkim.score}/30
+                          {securityScore.breakdown.dkim.score}/{securityScore.breakdown.dkim.maxScore}
                         </div>
                         <div className="text-sm text-gray-600">
                           DomainKeys Identified Mail
                         </div>
                       </div>
+                      {result.dkim.length > 0 && securityScore.breakdown.dkim.details && (
+                        <div className="text-xs text-gray-600 mt-2">
+                          {result.dkim.length} selector{result.dkim.length > 1 ? 's' : ''} found
+                          {securityScore.breakdown.dkim.details.keyLength > 0 && (
+                            <span> ({securityScore.breakdown.dkim.details.keyLength}-bit)</span>
+                          )}
+                        </div>
+                      )}
                       {securityScore.breakdown.dkim.issues.length > 0 && (
                         <div className="text-xs text-orange-600 mt-2">
                           {securityScore.breakdown.dkim.issues[0]}
@@ -289,86 +339,92 @@ const DomainChecker = () => {
                     </div>
                   </div>
 
-                  {/* DMARC Record Details */}
-                  {result.status === 'success' && result.record && (
-                    <div className="mt-6 p-4 bg-green-50 rounded-lg border border-green-200">
-                      <h4 className="font-medium text-green-800 mb-2">DMARC Record Found:</h4>
-                      <code className="text-sm font-mono bg-green-100 px-2 py-1 rounded text-green-700 break-all">
-                        {result.record}
+                  {/* DNS Records Display */}
+                  {result.dmarc.found && (
+                    <div className="mb-6 p-4 bg-green-50 rounded-lg border border-green-200">
+                      <h4 className="font-medium text-green-800 mb-2 flex items-center">
+                        <CheckCircle className="w-4 h-4 mr-2" />
+                        DMARC Record Found:
+                      </h4>
+                      <code className="text-sm font-mono bg-green-100 px-2 py-1 rounded text-green-700 break-all block">
+                        {result.dmarc.records[0].data}
+                      </code>
+                      <div className="text-xs text-green-600 mt-2">
+                        Provider: {result.dmarc.provider} | TTL: {result.dmarc.records[0].ttl}s
+                      </div>
+                    </div>
+                  )}
+
+                  {result.spf.found && (
+                    <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                      <h4 className="font-medium text-blue-800 mb-2 flex items-center">
+                        <CheckCircle className="w-4 h-4 mr-2" />
+                        SPF Record Found:
+                      </h4>
+                      <code className="text-sm font-mono bg-blue-100 px-2 py-1 rounded text-blue-700 break-all block">
+                        {result.spf.records[0].data}
                       </code>
                     </div>
                   )}
 
-                  {/* Recommendations */}
-                  {securityScore.recommendations.length > 0 && (
-                    <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                      <h4 className="font-medium text-blue-800 mb-3 flex items-center">
-                        <TrendingUp className="w-4 h-4 mr-2" />
-                        Recommendations for Improvement:
+                  {result.dkim.length > 0 && (
+                    <div className="mb-6 p-4 bg-purple-50 rounded-lg border border-purple-200">
+                      <h4 className="font-medium text-purple-800 mb-2 flex items-center">
+                        <CheckCircle className="w-4 h-4 mr-2" />
+                        DKIM Records Found:
                       </h4>
-                      <ul className="space-y-2 text-sm text-blue-700">
-                        {securityScore.recommendations.map((rec, index) => (
-                          <li key={index} className="flex items-start space-x-2">
-                            <span className="text-blue-500 mt-1">•</span>
-                            <span>{rec}</span>
-                          </li>
+                      {result.dkim.map((selector, index) => (
+                        <div key={index} className="mb-2">
+                          <div className="text-sm font-medium text-purple-700">
+                            Selector: {selector.selector}
+                          </div>
+                          <code className="text-xs font-mono bg-purple-100 px-2 py-1 rounded text-purple-600 break-all block">
+                            {selector.records[0].data.substring(0, 100)}...
+                          </code>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Action Plan */}
+                  {actionPlan && actionPlan.length > 0 && (
+                    <div className="mb-6">
+                      <h4 className="font-medium text-gray-900 mb-3 flex items-center">
+                        <TrendingUp className="w-4 h-4 mr-2" />
+                        Recommended Actions:
+                      </h4>
+                      <div className="space-y-3">
+                        {actionPlan.slice(0, 2).map((action, index) => (
+                          <div key={index} className={`p-3 rounded-lg border ${getPriorityColor(action.priority)}`}>
+                            <div className="flex items-center justify-between mb-2">
+                              <h5 className="font-medium">{action.title}</h5>
+                              <span className="text-xs uppercase font-medium">{action.priority}</span>
+                            </div>
+                            <p className="text-sm mb-2">{action.description}</p>
+                            <ul className="text-xs space-y-1">
+                              {action.steps.slice(0, 2).map((step, stepIndex) => (
+                                <li key={stepIndex} className="flex items-start">
+                                  <span className="mr-2">•</span>
+                                  <span>{step}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
                         ))}
-                      </ul>
+                      </div>
                     </div>
                   )}
 
                   {/* Action Buttons */}
-                  <div className="mt-6 flex flex-col sm:flex-row gap-3">
+                  <div className="flex flex-col sm:flex-row gap-3">
                     <button className="btn-primary flex-1">
+                      <Shield className="w-4 h-4 mr-2" />
                       Start DMARC Journey
                     </button>
                     <button className="btn-outline flex-1">
+                      <TrendingUp className="w-4 h-4 mr-2" />
                       Get Detailed Report
                     </button>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-
-            {/* Simple Result (fallback for errors) */}
-            {result && !securityScore && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: -20 }}
-                transition={{ duration: 0.3 }}
-                className={`relative rounded-xl border-2 p-6 ${getResultStyles()}`}
-              >
-                <button
-                  onClick={closeResult}
-                  className="absolute top-4 right-4 p-1 hover:bg-black/10 rounded-full transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-
-                <div className="flex items-start space-x-4">
-                  <div className="flex-shrink-0 mt-1">
-                    {getResultIcon()}
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-lg mb-2">
-                      Analysis Results for {domain}
-                    </h3>
-                    <p className="leading-relaxed">{result.message}</p>
-                    
-                    {result.recommendations && (
-                      <div className="mt-4">
-                        <h4 className="font-medium mb-2">Recommendations:</h4>
-                        <ul className="space-y-1 text-sm">
-                          {result.recommendations.map((rec, index) => (
-                            <li key={index} className="flex items-start space-x-2">
-                              <span className="text-primary-600 mt-1">•</span>
-                              <span>{rec}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
                   </div>
                 </div>
               </motion.div>
@@ -387,29 +443,29 @@ const DomainChecker = () => {
               <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                 <Shield className="w-6 h-6 text-primary-600" />
               </div>
-              <h3 className="font-semibold text-gray-900 mb-2">DMARC</h3>
+              <h3 className="font-semibold text-gray-900 mb-2">Real-time DNS</h3>
               <p className="text-sm text-gray-600">
-                Domain-based Message Authentication, Reporting & Conformance
+                Live DNS validation using multiple authoritative sources
               </p>
             </div>
 
             <div className="text-center p-6 bg-gray-50 rounded-xl">
               <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Mail className="w-6 h-6 text-primary-600" />
+                <Zap className="w-6 h-6 text-primary-600" />
               </div>
-              <h3 className="font-semibold text-gray-900 mb-2">SPF</h3>
+              <h3 className="font-semibold text-gray-900 mb-2">Instant Analysis</h3>
               <p className="text-sm text-gray-600">
-                Sender Policy Framework for email authentication
+                Comprehensive security scoring in seconds
               </p>
             </div>
 
             <div className="text-center p-6 bg-gray-50 rounded-xl">
               <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Lock className="w-6 h-6 text-primary-600" />
+                <TrendingUp className="w-6 h-6 text-primary-600" />
               </div>
-              <h3 className="font-semibold text-gray-900 mb-2">DKIM</h3>
+              <h3 className="font-semibold text-gray-900 mb-2">Expert Guidance</h3>
               <p className="text-sm text-gray-600">
-                DomainKeys Identified Mail for message integrity
+                Actionable recommendations from security experts
               </p>
             </div>
           </motion.div>
