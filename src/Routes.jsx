@@ -11,6 +11,8 @@ import MyDomains from "./pages/MyDomains";
 import DomainDetail from "./pages/DomainDetail";
 import Settings from "./pages/Settings";
 import UserProfile from "./pages/UserProfile";
+import Reports from "./pages/Reports";
+import ThreatIntelligence from "./pages/ThreatIntelligence";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import Header from "./components/layout/Header";
@@ -73,6 +75,22 @@ const AppRoutes = () => {
 							element={
 								<ProtectedRoute>
 									<DomainDetail />
+								</ProtectedRoute>
+							}
+						/>
+						<Route
+							path="/dashboard/reports"
+							element={
+								<ProtectedRoute>
+									<Reports />
+								</ProtectedRoute>
+							}
+						/>
+						<Route
+							path="/dashboard/threats"
+							element={
+								<ProtectedRoute>
+									<ThreatIntelligence />
 								</ProtectedRoute>
 							}
 						/>

@@ -11,6 +11,8 @@ import {
 	Menu,
 	X,
 	ChevronDown,
+	FileText,
+	AlertTriangle,
 } from "lucide-react";
 import { useAuthContext } from "../../context/AuthContext";
 import { useNotification } from "../../context/NotificationContext";
@@ -62,7 +64,8 @@ const DashboardHeader = () => {
 	const navigation = [
 		{ name: "My Dashboard", href: "/dashboard", icon: BarChart3 },
 		{ name: "My Domains", href: "/dashboard/domains", icon: Globe },
-		{ name: "Configuration", href: "/dashboard/settings", icon: Settings },
+		{ name: "Reports & Analytics", href: "/dashboard/reports", icon: FileText },
+		{ name: "Threat Intelligence", href: "/dashboard/threats", icon: AlertTriangle },
 	];
 
 	const userMenuItems = [
