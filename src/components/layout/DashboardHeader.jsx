@@ -136,13 +136,13 @@ const DashboardHeader = () => {
 									initial={{ opacity: 0, y: -10 }}
 									animate={{ opacity: 1, y: 0 }}
 									exit={{ opacity: 0, y: -10 }}
-									className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1">
+									className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
 									{userMenuItems.map((item) => (
 										<Link
 											key={item.name}
 											to={item.href}
 											onClick={() => setIsUserMenuOpen(false)}
-											className="flex items-center space-x-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+											className="flex items-center space-x-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
 											<item.icon className="w-4 h-4" />
 											<span>{item.name}</span>
 										</Link>
@@ -150,7 +150,7 @@ const DashboardHeader = () => {
 									<hr className="my-1" />
 									<button
 										onClick={handleLogout}
-										className="flex items-center space-x-3 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+										className="flex items-center space-x-3 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">
 										<LogOut className="w-4 h-4" />
 										<span>Logout</span>
 									</button>

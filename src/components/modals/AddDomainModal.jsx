@@ -53,21 +53,21 @@ const AddDomainModal = ({ onClose, onAdd }) => {
 		<AnimatePresence>
 			<div className="fixed inset-0 z-50 overflow-y-auto">
 				<div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-					{/* Background overlay */}
+					{/* Background overlay - Made lighter and more transparent */}
 					<motion.div
 						initial={{ opacity: 0 }}
 						animate={{ opacity: 1 }}
 						exit={{ opacity: 0 }}
-						className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75"
+						className="fixed inset-0 transition-opacity bg-black bg-opacity-25 backdrop-blur-sm"
 						onClick={onClose}
 					/>
 
-					{/* Modal */}
+					{/* Modal - Increased z-index to ensure it's above the backdrop */}
 					<motion.div
 						initial={{ opacity: 0, scale: 0.95, y: 20 }}
 						animate={{ opacity: 1, scale: 1, y: 0 }}
 						exit={{ opacity: 0, scale: 0.95, y: 20 }}
-						className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-xl">
+						className="relative inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-xl z-60">
 						{/* Header */}
 						<div className="flex items-center justify-between mb-6">
 							<h3 className="text-lg font-semibold text-gray-900">
@@ -192,6 +192,7 @@ const AddDomainModal = ({ onClose, onAdd }) => {
 		</AnimatePresence>
 	);
 };
+
 AddDomainModal.propTypes = {
 	onClose: PropTypes.func.isRequired,
 	onAdd: PropTypes.func.isRequired,
