@@ -30,6 +30,7 @@ import {
   Legend,
 } from 'chart.js'
 
+// Register Chart.js components
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -391,7 +392,7 @@ const Reports = () => {
           >
             <h2 className="text-xl font-bold text-gray-900 mb-4">Top Threats</h2>
             <div className="space-y-4">
-              {reportSummary.topThreats.map((threat, index) => (
+              {reportSummary.topThreats.map((threat) => (
                 <div key={threat.type} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div>
                     <div className="font-medium text-gray-900">{threat.type}</div>
@@ -399,7 +400,7 @@ const Reports = () => {
                   </div>
                   <div className="flex items-center">
                     {threat.trend === 'up' && <TrendingUp className="w-4 h-4 text-red-500" />}
-                    {threat.trend === 'down' && <TrendingDown className="w-4 h-4 text-green-500" />}
+                    {threat.trend === 'down' && <TrendingUp className="w-4 h-4 text-green-500 rotate-180" />}
                     {threat.trend === 'stable' && <div className="w-4 h-4 bg-gray-400 rounded-full" />}
                   </div>
                 </div>
@@ -416,7 +417,7 @@ const Reports = () => {
           >
             <h2 className="text-xl font-bold text-gray-900 mb-4">Domain Health</h2>
             <div className="space-y-4">
-              {reportSummary.domainHealth.map((domain, index) => (
+              {reportSummary.domainHealth.map((domain) => (
                 <div key={domain.domain} className="p-3 bg-gray-50 rounded-lg">
                   <div className="flex items-center justify-between mb-2">
                     <div className="font-medium text-gray-900">{domain.domain}</div>
