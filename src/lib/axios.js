@@ -1,7 +1,5 @@
 import axios from "axios";
-
-const API_BASE_URL =
-	import.meta.env.VITE_API_URL || "http://127.0.0.1:8000/api";
+import { API_BASE_URL } from "./constants";
 
 // Create axios instance with default configuration
 const axiosInstance = axios.create({
@@ -13,15 +11,13 @@ const axiosInstance = axios.create({
 	},
 });
 
-// ❌ Eliminamos el interceptor de request: ya no usamos token manual
-// ❌ Eliminamos también el manejo de localStorage en el interceptor de response
-
 axiosInstance.interceptors.response.use(
 	(response) => response,
 	(error) => {
 		// Don't redirect on network errors - let components handle them
 		if (error.code === 'ERR_NETWORK' || error.message === 'Network Error') {
 			console.error('Network error - backend may not be running:', error);
+			console.error('Make sure your backend is running at:', API_BASE_URL);
 			return Promise.reject(error);
 		}
 		

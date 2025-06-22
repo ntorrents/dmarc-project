@@ -52,5 +52,9 @@ export const STORAGE_KEYS = {
 	USER_EMAIL: "userEmail",
 };
 
-// Environment
-export const IS_DEV = import.meta.env.MODE === "development";
+// Environment - Check both dev mode and environment variable
+export const IS_DEV = import.meta.env.MODE === "development" && 
+                     (import.meta.env.VITE_DEV_MODE !== "false");
+
+// Backend URL
+export const API_BASE_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000/api";

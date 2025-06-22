@@ -1,17 +1,15 @@
 import { Navigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import { useAuthContext } from "./context/AuthContext";
+import { IS_DEV } from "./lib/constants";
 
 const ProtectedRoute = ({ children }) => {
-	// Check if we're in development mode
-	const isDev = import.meta.env.MODE === "development";
-	
-	// In development mode, allow access without authentication
-	if (isDev) {
+	// In development mode with mock data, allow access without authentication
+	if (IS_DEV) {
 		return children;
 	}
 
-	// In production, use normal authentication flow
+	// In production or when connecting to real backend, use normal authentication flow
 	const { isAuthenticated, loading } = useAuthContext();
 
 	if (loading) {

@@ -2,9 +2,12 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff, Shield, ArrowRight } from "lucide-react";
+import { useAuthContext } from "../context/AuthContext";
+import { IS_DEV } from "../lib/constants";
 
 const Login = () => {
 	const navigate = useNavigate();
+	const { login } = useAuthContext();
 	const [formData, setFormData] = useState({
 		email: "",
 		password: "",
@@ -12,6 +15,7 @@ const Login = () => {
 	});
 	const [showPassword, setShowPassword] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
+	const [error, setError] = useState("");
 
 	const handleChange = (e) => {
 		const { name, value, type, checked } = e.target;
@@ -19,64 +23,31 @@ const Login = () => {
 			...prev,
 			[name]: type === "checkbox" ? checked : value,
 		}));
+		// Clear error when user starts typing
+		if (error) setError("");
 	};
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
+		setError("");
 		setIsLoading(true);
 
-		// const isDev =
-		// 	import.meta.env.DEV || window.location.hostname !== "127.0.0.1";
-
-		// if (isDev) {
-		// 	// 🔧 Simulación de login en entorno sandbox o desarrollo sin backend
-		// 	console.warn("Simulación de login en entorno de desarrollo");
-
-		// 	if (!formData.email || !formData.password) {
-		// 		alert("Por favor completa los campos");
-		// 		setIsLoading(false);
-		// 		return;
-		// 	}
-
-		// 	// ⚠️ Solo para pruebas. No guardar nunca tokens así en producción.
-		// 	localStorage.setItem("token", "fake-dev-token");
-		// 	localStorage.setItem("userName", formData.email.split("@")[0]);
-		// 	localStorage.setItem("userEmail", formData.email);
-
-		// 	navigate("/dashboard");
-		// 	setIsLoading(false);
-		// 	return;
-		// }
-
 		try {
-			// 🟢 Entorno real: usamos cookies HttpOnly
-			const res = await fetch("http://127.0.0.1:8000/auth/login/", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					email: formData.email,
-					password: formData.password,
-				}),
-				credentials: "include", // ✅ MUY IMPORTANTE para HttpOnly cookies
-			});
-
-			const data = await res.json();
-
-			if (res.ok) {
-				// Opcional: guardar datos del usuario si los necesitas en la UI
-				// pero NUNCA el token si es HttpOnly
-				// localStorage.setItem("userName", data.user.username);
-				// localStorage.setItem("userEmail", data.user.email);
-
-				navigate("/dashboard");
-			} else {
-				alert(data.detail || "Error en login");
+			if (!formData.email || !formData.password) {
+				setError("Please fill in all fields");
+				return;
 			}
+
+			await login(formData);
+			navigate("/dashboard");
 		} catch (error) {
-			console.error("Error en login:", error);
-			alert("Fallo en la conexión con el servidor");
+			console.error("Login error:", error);
+			
+			if (error.code === 'ERR_NETWORK' || error.message === 'Network Error') {
+				setError("Cannot connect to backend server. Please ensure your backend is running at the configured URL.");
+			} else {
+				setError(error.message || "Login failed. Please check your credentials.");
+			}
 		} finally {
 			setIsLoading(false);
 		}
@@ -108,6 +79,13 @@ const Login = () => {
 					<p className="text-gray-300">
 						Sign in to your account to continue protecting your email domain
 					</p>
+					{IS_DEV && (
+						<div className="mt-4 p-3 bg-yellow-500/20 rounded-lg border border-yellow-400/30">
+							<p className="text-yellow-200 text-sm">
+								🔧 Development Mode: Using mock data
+							</p>
+						</div>
+					)}
 				</motion.div>
 
 				{/* Login Form */}
@@ -176,6 +154,16 @@ const Login = () => {
 								</button>
 							</div>
 						</div>
+
+						{/* Error Message */}
+						{error && (
+							<motion.div
+								initial={{ opacity: 0, y: -10 }}
+								animate={{ opacity: 1, y: 0 }}
+								className="p-3 bg-red-50 border border-red-200 rounded-lg">
+								<p className="text-sm text-red-800">{error}</p>
+							</motion.div>
+						)}
 
 						{/* Remember Me & Forgot Password */}
 						<div className="flex items-center justify-between">

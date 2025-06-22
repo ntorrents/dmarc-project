@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
-import {
-	authAPI,
-} from "../lib/api/auth";
+import { authAPI } from "../lib/api/auth";
 import { getErrorMessage } from "../lib/helpers";
+import { IS_DEV } from "../lib/constants";
 
 export const useAuth = () => {
 	const [user, setUser] = useState(null);
@@ -18,11 +17,8 @@ export const useAuth = () => {
 			setLoading(true);
 			setError(null);
 
-			// In development mode, create a mock user to bypass authentication
-			const isDev = import.meta.env.MODE === "development";
-			
-			if (isDev) {
-				// Create a mock user for development
+			// In development mode with mock data, create a mock user
+			if (IS_DEV) {
 				const mockUser = {
 					id: 1,
 					name: "Dev User",
@@ -34,7 +30,7 @@ export const useAuth = () => {
 				return;
 			}
 
-			// Production mode - use real authentication
+			// Production mode or real backend - use real authentication
 			const profile = await authAPI.getProfile();
 			setUser(profile);
 		} catch (error) {
@@ -42,7 +38,7 @@ export const useAuth = () => {
 			
 			// Check if it's a network error
 			if (error.code === 'ERR_NETWORK' || error.message === 'Network Error') {
-				setError("Unable to connect to server. Please check if the backend is running.");
+				setError("Unable to connect to backend server. Please ensure your backend is running.");
 			} else if (error.response?.status === 401) {
 				// Unauthorized - user not logged in, this is expected
 				setError(null);
@@ -61,10 +57,8 @@ export const useAuth = () => {
 			setError(null);
 			setLoading(true);
 
-			// In development mode, simulate successful login
-			const isDev = import.meta.env.MODE === "development";
-			
-			if (isDev) {
+			// In development mode with mock data, simulate successful login
+			if (IS_DEV) {
 				const mockUser = {
 					id: 1,
 					name: credentials.email.split('@')[0] || "Dev User",
@@ -75,7 +69,7 @@ export const useAuth = () => {
 				return mockUser;
 			}
 
-			// Production mode - use real authentication
+			// Production mode or real backend - use real authentication
 			const response = await authAPI.login(credentials);
 			const profile = await authAPI.getProfile();
 			setUser(profile);
@@ -94,10 +88,8 @@ export const useAuth = () => {
 		try {
 			setLoading(true);
 			
-			// In development mode, just clear the user
-			const isDev = import.meta.env.MODE === "development";
-			
-			if (!isDev) {
+			// In development mode with mock data, just clear the user
+			if (!IS_DEV) {
 				await authAPI.logout();
 			}
 		} catch (error) {
@@ -117,16 +109,14 @@ export const useAuth = () => {
 		try {
 			setError(null);
 			
-			// In development mode, just update the mock user
-			const isDev = import.meta.env.MODE === "development";
-			
-			if (isDev) {
+			// In development mode with mock data, just update the mock user
+			if (IS_DEV) {
 				const updatedUser = { ...user, ...data };
 				setUser(updatedUser);
 				return updatedUser;
 			}
 
-			// Production mode - use real API
+			// Production mode or real backend - use real API
 			const updatedUser = await authAPI.updateProfile(data);
 			setUser(updatedUser);
 			return updatedUser;
