@@ -13,6 +13,7 @@ import {
 	ChevronDown,
 } from "lucide-react";
 import { useAuthContext } from "../../context/AuthContext";
+import { useNotification } from "../../context/NotificationContext";
 
 const DashboardHeader = () => {
 	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -21,6 +22,7 @@ const DashboardHeader = () => {
 	const location = useLocation();
 
 	const { user, logout } = useAuthContext();
+	const { success, error } = useNotification();
 	
 	// Use mock data in development if user is not available
 	const isDev = import.meta.env.MODE === "development";
@@ -29,10 +31,27 @@ const DashboardHeader = () => {
 
 	const handleLogout = async () => {
 		try {
+			setIsUserMenuOpen(false);
 			await logout();
+			
+			// Clear any stored session data
+			localStorage.clear();
+			sessionStorage.clear();
+			
+			// Clear any cookies (if using httpOnly cookies, this would be handled by the backend)
+			document.cookie.split(";").forEach((c) => {
+				const eqPos = c.indexOf("=");
+				const name = eqPos > -1 ? c.substr(0, eqPos) : c;
+				document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+				document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=" + window.location.hostname;
+			});
+			
+			success("Logged out successfully");
 			navigate("/login");
-		} catch (error) {
-			console.error("Logout failed:", error);
+		} catch (err) {
+			console.error("Logout failed:", err);
+			error("Logout failed", "There was an error logging out. Please try again.");
+			
 			// In development, still navigate to login even if logout fails
 			if (isDev) {
 				navigate("/login");

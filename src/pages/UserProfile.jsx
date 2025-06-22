@@ -4,8 +4,13 @@ import { User, Mail, Lock, Building, Save, Eye, EyeOff, Shield } from 'lucide-re
 import { authAPI } from '../lib/api/auth'
 import { companiesAPI } from '../lib/api/companies'
 import { validateEmail, sanitizeInput, getErrorMessage } from '../lib/helpers'
+import { useAuthContext } from '../context/AuthContext'
+import { useNotification } from '../context/NotificationContext'
 
 const UserProfile = () => {
+  const { user, updateProfile } = useAuthContext()
+  const { success, error: showError } = useNotification()
+  
   const [profile, setProfile] = useState({
     name: '',
     email: '',
@@ -22,7 +27,6 @@ const UserProfile = () => {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState(null)
-  const [success, setSuccess] = useState('')
   const [showPasswords, setShowPasswords] = useState({
     current: false,
     new: false,
@@ -32,7 +36,7 @@ const UserProfile = () => {
 
   useEffect(() => {
     loadProfile()
-  }, [])
+  }, [user])
 
   const loadProfile = async () => {
     try {
@@ -45,8 +49,8 @@ const UserProfile = () => {
         // Mock data for development
         setTimeout(() => {
           setProfile({
-            name: localStorage.getItem('userName') || 'John Doe',
-            email: localStorage.getItem('userEmail') || 'john@example.com',
+            name: user?.name || 'Dev User',
+            email: user?.email || 'dev@example.com',
             currentPassword: '',
             newPassword: '',
             confirmPassword: ''
@@ -59,7 +63,7 @@ const UserProfile = () => {
             address: '123 Business St, City, State 12345'
           })
           
-          setIsAdmin(true) // Mock admin status
+          setIsAdmin(user?.role === 'admin')
           setLoading(false)
         }, 1000)
         return
@@ -98,7 +102,6 @@ const UserProfile = () => {
     }))
     
     if (error) setError(null)
-    if (success) setSuccess('')
   }
 
   const handleOrganizationChange = (field, value) => {
@@ -108,7 +111,6 @@ const UserProfile = () => {
     }))
     
     if (error) setError(null)
-    if (success) setSuccess('')
   }
 
   const handleSaveProfile = async () => {
@@ -149,9 +151,11 @@ const UserProfile = () => {
       
       if (isDev) {
         // Mock save
-        localStorage.setItem('userName', profile.name)
-        localStorage.setItem('userEmail', profile.email)
-        setSuccess('Profile updated successfully!')
+        await updateProfile({
+          name: profile.name,
+          email: profile.email
+        })
+        success('Profile updated successfully!')
         
         // Clear password fields
         setProfile(prev => ({
@@ -175,8 +179,9 @@ const UserProfile = () => {
       }
       
       await authAPI.updateProfile(updateData)
+      await updateProfile(updateData)
       
-      setSuccess('Profile updated successfully!')
+      success('Profile updated successfully!')
       
       // Clear password fields
       setProfile(prev => ({
@@ -187,7 +192,9 @@ const UserProfile = () => {
       }))
     } catch (err) {
       console.error('Error saving profile:', err)
-      setError(getErrorMessage(err))
+      const errorMessage = getErrorMessage(err)
+      setError(errorMessage)
+      showError('Failed to update profile', errorMessage)
     } finally {
       setSaving(false)
     }
@@ -213,16 +220,18 @@ const UserProfile = () => {
       
       if (isDev) {
         // Mock save
-        setSuccess('Organization settings updated successfully!')
+        success('Organization settings updated successfully!')
         return
       }
       
       // Production API call
       await companiesAPI.update(organization)
-      setSuccess('Organization settings updated successfully!')
+      success('Organization settings updated successfully!')
     } catch (err) {
       console.error('Error saving organization:', err)
-      setError(getErrorMessage(err))
+      const errorMessage = getErrorMessage(err)
+      setError(errorMessage)
+      showError('Failed to update organization settings', errorMessage)
     } finally {
       setSaving(false)
     }
@@ -266,26 +275,20 @@ const UserProfile = () => {
           <p className="text-gray-600 mt-1">Manage your account settings and preferences</p>
         </motion.div>
 
-        {/* Success/Error Messages */}
-        {(error || success) && (
+        {/* Error Display */}
+        {error && (
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className={`mb-6 p-4 rounded-lg ${
-              error ? 'bg-red-50 border border-red-200' : 'bg-green-50 border border-green-200'
-            }`}
+            className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg"
           >
-            <p className={error ? 'text-red-800' : 'text-green-800'}>
-              {error || success}
-            </p>
-            {error && (
-              <button 
-                onClick={() => setError(null)}
-                className="mt-2 text-sm text-red-600 hover:text-red-800 underline"
-              >
-                Dismiss
-              </button>
-            )}
+            <p className="text-red-800">{error}</p>
+            <button 
+              onClick={() => setError(null)}
+              className="mt-2 text-sm text-red-600 hover:text-red-800 underline"
+            >
+              Dismiss
+            </button>
           </motion.div>
         )}
 

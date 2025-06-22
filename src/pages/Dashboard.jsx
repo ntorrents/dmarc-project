@@ -4,6 +4,15 @@ import { Shield, Users, Globe, BarChart3, Settings, Bell, Plus, CheckCircle, Ale
 import { domainsAPI } from '../lib/api/domains'
 import { getErrorMessage } from '../lib/helpers'
 import AddDomainModal from '../components/modals/AddDomainModal'
+import { Doughnut } from 'react-chartjs-2'
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+} from 'chart.js'
+
+ChartJS.register(ArcElement, Tooltip, Legend)
 
 const Dashboard = () => {
   const [domains, setDomains] = useState([])
@@ -82,7 +91,6 @@ const Dashboard = () => {
       setLoading(true)
       setError(null)
       
-      // Check if we're in development mode
       const isDev = import.meta.env.MODE === 'development'
       
       if (isDev) {
@@ -118,6 +126,26 @@ const Dashboard = () => {
               lastCheck: '3 days ago',
               emails: '432',
               tag: 'development'
+            },
+            {
+              id: 4,
+              name: 'shop.io',
+              status: 'protected',
+              policy: 'reject',
+              compliance: 98,
+              lastCheck: '1 hour ago',
+              emails: '2,156',
+              tag: 'ecommerce'
+            },
+            {
+              id: 5,
+              name: 'blog.com',
+              status: 'warning',
+              policy: 'quarantine',
+              compliance: 75,
+              lastCheck: '3 hours ago',
+              emails: '543',
+              tag: 'content'
             }
           ])
           setLoading(false)
@@ -205,6 +233,90 @@ const Dashboard = () => {
         return <Users className="w-4 h-4 text-blue-500" />
       default:
         return null
+    }
+  }
+
+  // Calculate DMARC policy distribution
+  const getPolicyDistribution = () => {
+    const policyCount = {
+      reject: 0,
+      quarantine: 0,
+      none: 0,
+      'no record': 0,
+      invalid: 0
+    }
+
+    domains.forEach(domain => {
+      if (domain.policy && ['reject', 'quarantine', 'none'].includes(domain.policy)) {
+        policyCount[domain.policy]++
+      } else if (domain.status === 'error') {
+        policyCount['no record']++
+      } else {
+        policyCount['invalid']++
+      }
+    })
+
+    return policyCount
+  }
+
+  const policyDistribution = getPolicyDistribution()
+  
+  const doughnutData = {
+    labels: ['Reject', 'Quarantine', 'None', 'No Record', 'Invalid'],
+    datasets: [
+      {
+        data: [
+          policyDistribution.reject,
+          policyDistribution.quarantine,
+          policyDistribution.none,
+          policyDistribution['no record'],
+          policyDistribution.invalid
+        ],
+        backgroundColor: [
+          '#10b981', // green for reject (best)
+          '#f59e0b', // yellow for quarantine (medium)
+          '#ef4444', // red for none (poor)
+          '#6b7280', // gray for no record
+          '#dc2626'  // dark red for invalid
+        ],
+        borderColor: [
+          '#059669',
+          '#d97706',
+          '#dc2626',
+          '#4b5563',
+          '#b91c1c'
+        ],
+        borderWidth: 2,
+        hoverOffset: 4
+      }
+    ]
+  }
+
+  const doughnutOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: {
+          padding: 20,
+          usePointStyle: true,
+          font: {
+            size: 12
+          }
+        }
+      },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            const label = context.label || ''
+            const value = context.parsed || 0
+            const total = context.dataset.data.reduce((a, b) => a + b, 0)
+            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0
+            return `${label}: ${value} domains (${percentage}%)`
+          }
+        }
+      }
     }
   }
 
@@ -369,6 +481,47 @@ const Dashboard = () => {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="space-y-6"
           >
+            {/* DMARC Policy Distribution Chart */}
+            <div className="card">
+              <h2 className="text-xl font-bold text-gray-900 mb-4">DMARC Policy Distribution</h2>
+              <div className="h-64">
+                <Doughnut data={doughnutData} options={doughnutOptions} />
+              </div>
+              <div className="mt-4 text-sm text-gray-600">
+                <p className="mb-2">Policy breakdown across {domains.length} domains:</p>
+                <div className="space-y-1">
+                  <div className="flex justify-between">
+                    <span className="flex items-center">
+                      <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                      Reject (Secure)
+                    </span>
+                    <span>{policyDistribution.reject}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="flex items-center">
+                      <div className="w-3 h-3 bg-yellow-500 rounded-full mr-2"></div>
+                      Quarantine
+                    </span>
+                    <span>{policyDistribution.quarantine}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="flex items-center">
+                      <div className="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
+                      None (Monitor)
+                    </span>
+                    <span>{policyDistribution.none}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="flex items-center">
+                      <div className="w-3 h-3 bg-gray-500 rounded-full mr-2"></div>
+                      No Record
+                    </span>
+                    <span>{policyDistribution['no record']}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Quick Actions */}
             <div className="card">
               <h2 className="text-xl font-bold text-gray-900 mb-4">Quick Actions</h2>
@@ -427,18 +580,6 @@ const Dashboard = () => {
               <button className="w-full mt-4 text-sm text-primary-600 hover:text-primary-700 font-medium">
                 View All Activity →
               </button>
-            </div>
-
-            {/* Security Score */}
-            <div className="card bg-gradient-to-br from-primary-50 to-primary-100 border-primary-200">
-              <div className="text-center">
-                <h3 className="text-lg font-bold text-gray-900 mb-2">Overall Security Score</h3>
-                <div className="text-4xl font-bold text-primary-600 mb-2">87/100</div>
-                <p className="text-sm text-gray-600 mb-4">Good security posture</p>
-                <button className="btn-primary w-full">
-                  Improve Score
-                </button>
-              </div>
             </div>
           </motion.div>
         </div>
