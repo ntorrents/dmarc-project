@@ -1,74 +1,107 @@
-// API Endpoints
+// API Configuration and Constants
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
+
+// Environment Configuration
+export const IS_DEV = import.meta.env.MODE === 'development' && import.meta.env.VITE_USE_MOCK_DATA === 'true';
+export const IS_PROD = !IS_DEV;
+
+// API Endpoints - Single Source of Truth
 export const API_ENDPOINTS = {
-	AUTH: {
-		LOGIN: "/api/token/",
-		REFRESH: "/api/token/refresh/",
-		PROFILE: "/api/auth/me/",
-		LOGOUT: "/api/auth/logout/",
-	},
-	USERS: "/users/",
-	CLIENTES: "/clientes/",
-	DOMINIOS: "/dominios/",
-	DNS_RECORDS: "/dns-records/",
-	TAGS: "/tags/",
-	ACCESS: "/domain-access/",
-	AUDIT_LOGS: "/audit-logs/",
-	SYSTEM_SETTINGS: "/system-settings/",
+  AUTH: {
+    LOGIN_LOGOUT_REFRESH: `${API_BASE_URL}/auth/auth/`,
+    REGISTER: `${API_BASE_URL}/auth/register/`,
+    PROFILE: `${API_BASE_URL}/auth/profile/`,
+    COMPANIES: `${API_BASE_URL}/auth/empresas/`,
+    COMPANY_DETAIL: (id) => `${API_BASE_URL}/auth/empresas/${id}/`,
+    ROLES: `${API_BASE_URL}/auth/roles/`,
+    ROLE_DETAIL: (id) => `${API_BASE_URL}/auth/roles/${id}/`,
+    USERS: `${API_BASE_URL}/auth/users/`,
+    USER_DETAIL: (id) => `${API_BASE_URL}/auth/users/${id}/`,
+  },
+
+  PANEL: {
+    TAGS: `${API_BASE_URL}/panel/tags/`,
+    TAG_DETAIL: (id) => `${API_BASE_URL}/panel/tags/${id}/`,
+    DOMAINS: `${API_BASE_URL}/panel/dominios/`,
+    DOMAIN_DETAIL: (id) => `${API_BASE_URL}/panel/dominios/${id}/`,
+    DOMAIN_DNS_RECORDS: (id) => `${API_BASE_URL}/panel/dominios/${id}/dns_records/`,
+    DOMAIN_CHECK_DNS: (id) => `${API_BASE_URL}/panel/dominios/${id}/check_dns/`,
+    DOMAIN_BULK_UPDATE: `${API_BASE_URL}/panel/dominios/bulk_update/`,
+    DOMAIN_STATS: `${API_BASE_URL}/panel/dominios/stats/`,
+    DNS_RECORDS: `${API_BASE_URL}/panel/dns-records/`,
+    DNS_RECORD_DETAIL: (id) => `${API_BASE_URL}/panel/dns-records/${id}/`,
+    DNS_RECORDS_BULK_CREATE: `${API_BASE_URL}/panel/dns-records/bulk_create/`,
+    AUDIT_LOGS: `${API_BASE_URL}/panel/audit-logs/`,
+    AUDIT_LOG_DETAIL: (id) => `${API_BASE_URL}/panel/audit-logs/${id}/`,
+    SYSTEM_SETTINGS: `${API_BASE_URL}/panel/system-settings/`,
+    SYSTEM_SETTING_DETAIL: (id) => `${API_BASE_URL}/panel/system-settings/${id}/`,
+  },
+
+  API_DOCS: `${API_BASE_URL}/docs/`,
+  API_REDOC: `${API_BASE_URL}/redoc/`,
+  API_SCHEMA: `${API_BASE_URL}/schema/`,
 };
 
 // User Roles
 export const USER_ROLES = {
-	ADMIN: "admin",
-	USER: "user",
+  SUPER_ADMIN: 'super_admin',
+  CLIENT_ADMIN: 'client_admin',
+  USER: 'user',
+  READ_ONLY: 'read_only',
+  CONFIG_ONLY: 'config_only',
 };
 
 // Domain Status
 export const DOMAIN_STATUS = {
-	ACTIVE: "active",
-	INACTIVE: "inactive",
-	PENDING: "pending",
-	ERROR: "error",
+  ACTIVE: 'active',
+  INACTIVE: 'inactive',
+  PENDING: 'pending',
+  ERROR: 'error',
 };
 
 // DMARC Policies
 export const DMARC_POLICIES = {
-	NONE: "none",
-	QUARANTINE: "quarantine",
-	REJECT: "reject",
+  NONE: 'none',
+  QUARANTINE: 'quarantine',
+  REJECT: 'reject',
 };
 
 // DNS Record Types
 export const DNS_RECORD_TYPES = {
-	DMARC: "DMARC",
-	SPF: "SPF",
-	DKIM: "DKIM",
-	MX: "MX",
-	TXT: "TXT",
-	A: "A",
-	AAAA: "AAAA",
-	CNAME: "CNAME",
+  DMARC: 'DMARC',
+  SPF: 'SPF',
+  DKIM: 'DKIM',
+  MX: 'MX',
+  TXT: 'TXT',
+  A: 'A',
+  AAAA: 'AAAA',
+  CNAME: 'CNAME',
 };
 
 // Compliance Levels
 export const COMPLIANCE_LEVELS = {
-	NONE: "none",
-	LOW: "low",
-	MEDIUM: "medium",
-	HIGH: "high",
+  NONE: 'none',
+  LOW: 'low',
+  MEDIUM: 'medium',
+  HIGH: 'high',
 };
 
-// Local Storage Keys
-export const STORAGE_KEYS = {
-	TOKEN: "token",
-	USER_NAME: "userName",
-	USER_EMAIL: "userEmail",
+// Application Routes
+export const ROUTES = {
+  HOME: '/',
+  LOGIN: '/login',
+  REGISTER: '/signup',
+  DASHBOARD: '/dashboard',
+  DOMAINS: '/dashboard/domains',
+  DOMAIN_DETAIL: (id) => `/dashboard/domains/${id}`,
+  REPORTS: '/dashboard/reports',
+  THREATS: '/dashboard/threats',
+  SETTINGS: '/dashboard/settings',
+  PROFILE: '/dashboard/profile',
+  USERS: '/dashboard/users',
+  AUDIT_LOGS: '/dashboard/audit-logs',
+  PRICING: '/pricing',
+  CONTACT: '/contact',
+  TERMS: '/terms',
+  PRIVACY: '/privacy',
 };
-
-// Environment - Check both dev mode and environment variable
-export const IS_DEV =
-	import.meta.env.MODE === "development" &&
-	import.meta.env.VITE_DEV_MODE !== "false";
-
-// Backend URL
-export const API_BASE_URL =
-	import.meta.env.VITE_API_URL || "http://127.0.0.1:8000/api";

@@ -1,223 +1,268 @@
-# SafeDMARC - Email Security Platform
+# SafeDMARC - Secure Email Authentication Platform
 
-A modern React application for managing email security through DMARC, SPF, and DKIM configuration and monitoring.
+A modern React application for managing email security through DMARC, SPF, and DKIM configuration and monitoring with **secure HttpOnly cookie-based authentication**.
+
+## 🔒 Security Architecture
+
+### Authentication System
+- **HttpOnly Cookies**: Session management via secure, HttpOnly cookies (no localStorage tokens)
+- **CSRF Protection**: Automatic CSRF token handling for Django backend
+- **Secure Session Management**: Automatic session refresh and cleanup
+- **Role-Based Access Control**: Granular permissions system
+
+### API Security
+- **Credentials Included**: All requests include cookies automatically
+- **Error Handling**: Comprehensive error handling with automatic logout on 401
+- **Network Resilience**: Fallback handling for network issues
+- **Request Interceptors**: Automatic CSRF token injection
 
 ## 🏗️ Project Architecture
 
-This project follows a modern React architecture with TypeScript support, organized into logical layers for maintainability and scalability.
-
+### Core Structure
 ```
 src/
-├── components/          # Reusable UI components
-├── pages/              # Page-level components (routes)
-├── lib/                # Core business logic and API layer
-├── hooks/              # Custom React hooks
-├── context/            # React context providers
-├── utils/              # Pure utility functions
-├── types/              # TypeScript type definitions
-└── Routes.jsx          # Application routing configuration
+├── lib/
+│   ├── constants.js          # Single source of truth for all endpoints/config
+│   ├── axios.js              # Secure HTTP client with cookie handling
+│   └── api/                  # API service modules
+│       ├── auth.js           # Authentication endpoints
+│       └── domains.js        # Domain management endpoints
+├── hooks/
+│   └── useAuth.js            # Authentication state management
+├── context/
+│   └── AuthContext.jsx       # Global auth context provider
+├── components/
+│   └── layout/               # Layout components
+├── pages/                    # Route components
+├── utils/                    # Utility functions
+└── ProtectedRoute.jsx        # Route protection with permissions
 ```
 
-## 📁 Directory Structure Explained
-
-### `/src/components/`
-**Purpose**: Reusable UI components that can be used across multiple pages.
-
-**What's inside**:
-- `layout/` - Layout components (Header, Footer, Navigation)
-- `sections/` - Page sections (Hero, Services, Pricing, etc.)
-- `modals/` - Modal dialogs and overlays
-
-**Why we need it**: Promotes code reusability, maintains consistent UI patterns, and makes the codebase easier to maintain. Components here should be generic enough to be used in multiple contexts.
-
-### `/src/pages/`
-**Purpose**: Top-level page components that represent different routes in the application.
-
-**What's inside**:
-- `Dashboard.jsx` - Main dashboard page
-- `MyDomains.jsx` - Domain management page
-- `Settings.jsx` - User and system settings
-- `Login.jsx`, `Signup.jsx` - Authentication pages
-- `Contact.jsx`, `Pricing.jsx` - Marketing pages
-
-**Why we need it**: Separates page-level logic from reusable components. Each file represents a distinct route/page in the application, making navigation and code organization clear.
-
-### `/src/lib/`
-**Purpose**: Core business logic, API communication, and application configuration.
-
-**What's inside**:
-- `api/` - API service modules for different entities
-  - `auth.ts` - Authentication API calls
-  - `domains.ts` - Domain management API
-  - `users.ts` - User management API
-  - `companies.ts` - Organization/company API
-  - `dnsRecords.ts` - DNS record management
-- `axios.ts` - HTTP client configuration with interceptors
-- `constants.ts` - Application-wide constants and configuration
-- `helpers.ts` - Utility functions for validation, formatting, etc.
-
-**Why we need it**: 
-- **Separation of concerns**: Business logic is separated from UI components
-- **Centralized API management**: All API calls are organized by entity type
-- **Type safety**: TypeScript interfaces ensure data consistency
-- **Reusability**: API functions can be used across multiple components
-- **Error handling**: Centralized error handling and response processing
-
-### `/src/hooks/`
-**Purpose**: Custom React hooks that encapsulate stateful logic and side effects.
-
-**What's inside**:
-- `useAuth.ts` - Authentication state management
-- `useDomains.ts` - Domain data fetching and management
-- `useDNSRecords.ts` - DNS record operations
-
-**Why we need it**:
-- **State management**: Encapsulates complex state logic that can be reused
-- **Side effect management**: Handles API calls, subscriptions, and cleanup
-- **Component simplification**: Keeps components focused on rendering
-- **Testing**: Hooks can be tested independently from components
-- **Reusability**: Same logic can be used across multiple components
-
-### `/src/context/`
-**Purpose**: React Context providers for global state management.
-
-**What's inside**:
-- `AuthContext.tsx` - Global authentication state
-- `NotificationContext.tsx` - Global notification system
-
-**Why we need it**:
-- **Global state**: Manages state that needs to be accessed across the entire app
-- **Prop drilling avoidance**: Prevents passing props through multiple component levels
-- **Centralized logic**: Authentication and notifications are handled in one place
-- **Performance**: Context prevents unnecessary re-renders when used properly
-
-### `/src/utils/`
-**Purpose**: Pure utility functions that don't depend on React or application state.
-
-**What's inside**:
-- `dmarcChecker.js` - DMARC record validation logic
-- `emailSecurityScorer.js` - Email security scoring algorithms
-- `ScrollToTop.jsx` - Route change scroll behavior
-
-**Why we need it**:
-- **Pure functions**: No side effects, easy to test and reason about
-- **Reusability**: Can be used anywhere in the application
-- **Business logic**: Contains domain-specific algorithms and calculations
-- **Framework independence**: Could be moved to other projects easily
-
-### `/src/types/`
-**Purpose**: TypeScript type definitions and interfaces.
-
-**What's inside**:
-- `index.ts` - All TypeScript interfaces and types used throughout the app
-
-**Why we need it**:
-- **Type safety**: Prevents runtime errors by catching type mismatches
-- **Documentation**: Types serve as documentation for data structures
-- **IDE support**: Better autocomplete and refactoring capabilities
-- **API contracts**: Ensures frontend and backend data structures match
-
-## 🔄 Data Flow Architecture
-
-```
-User Interaction → Page Component → Custom Hook → API Service → Backend
-                                      ↓
-                  Context Provider ← Custom Hook ← API Response
-                                      ↓
-                  Component Re-render ← Context Consumer
-```
-
-## 🛠️ Key Architectural Decisions
-
-### 1. **Layered Architecture**
-- **Presentation Layer**: React components and pages
-- **Business Logic Layer**: Custom hooks and context
-- **Data Access Layer**: API services in `/lib/api/`
-- **Utility Layer**: Pure functions in `/utils/`
-
-### 2. **API Organization**
-Each entity (domains, users, auth) has its own API module with consistent patterns:
-- CRUD operations
-- Type-safe interfaces
-- Error handling
-- Input validation
-
-### 3. **State Management Strategy**
-- **Local state**: `useState` for component-specific state
-- **Server state**: Custom hooks with API calls
-- **Global state**: React Context for authentication and notifications
-- **URL state**: React Router for navigation state
-
-### 4. **Development vs Production**
-The app includes mock data and development modes:
-- `IS_DEV` constant determines environment
-- Mock data in hooks for development without backend
-- Production API calls when backend is available
+### Business Logic Model
+- **Client** (Company) → Multiple **Domains** + **Users**
+- **Domain** → **SPF**, **DKIM**, **DMARC** records
+- **Tags** → Domain categorization and filtering
+- **Role-Based Access**:
+  - Super Admin: Full system access
+  - Client Admin: Company management
+  - User: Limited access based on permissions
+  - Read-Only: View-only access
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 - Node.js 18+
-- npm or yarn
+- Backend API running (or use DEV mode)
 
 ### Installation
 ```bash
 # Install dependencies
 npm install
 
+# Copy environment file
+cp .env.example .env
+
 # Start development server
 npm run dev
+```
 
+### Environment Configuration
+```env
+# API Configuration
+VITE_API_BASE_URL=/api/v1
+
+# Development Mode (uses mock data when backend unavailable)
+VITE_USE_MOCK_DATA=true
+VITE_DEV_MODE=true
+```
+
+## 🔧 Development vs Production
+
+### Development Mode
+- **Mock Data**: Automatic fallback when backend unavailable
+- **Pre-filled Forms**: Login form pre-populated for testing
+- **Console Logging**: Detailed request/response logging
+- **Error Tolerance**: Graceful handling of network issues
+
+### Production Mode
+- **Real Backend**: Full API integration
+- **Secure Cookies**: HttpOnly session management
+- **Error Handling**: User-friendly error messages
+- **Performance Optimized**: Minimal logging and optimizations
+
+## 🛡️ Security Features
+
+### Cookie-Based Authentication
+```javascript
+// Automatic cookie inclusion
+withCredentials: true
+
+// CSRF protection
+headers: {
+  'X-CSRFToken': getCsrfToken(),
+  'X-Requested-With': 'XMLHttpRequest'
+}
+```
+
+### Protected Routes
+```javascript
+// Permission-based protection
+<ProtectedRoute requiredPermission="view_domains">
+  <MyDomains />
+</ProtectedRoute>
+
+// Admin-only routes
+<ProtectedRoute adminOnly>
+  <Settings />
+</ProtectedRoute>
+```
+
+### Automatic Session Management
+- **Auto-logout on 401**: Automatic redirect to login
+- **Session Refresh**: Transparent session renewal
+- **Cookie Cleanup**: Secure logout with cookie clearing
+- **Cross-tab Sync**: Session state synchronized across tabs
+
+## 📡 API Integration
+
+### Centralized Configuration
+All API endpoints defined in `src/lib/constants.js`:
+```javascript
+export const API_ENDPOINTS = {
+  AUTH: {
+    LOGIN_LOGOUT_REFRESH: `${API_BASE_URL}/auth/auth/`,
+    PROFILE: `${API_BASE_URL}/auth/profile/`,
+    // ...
+  },
+  PANEL: {
+    DOMAINS: `${API_BASE_URL}/panel/dominios/`,
+    DOMAIN_DETAIL: (id) => `${API_BASE_URL}/panel/dominios/${id}/`,
+    // ...
+  }
+};
+```
+
+### Secure HTTP Client
+```javascript
+// Automatic cookie handling
+const response = await axiosInstance.get(API_ENDPOINTS.AUTH.PROFILE);
+
+// Automatic error handling
+// 401 → Redirect to login
+// 403 → Permission denied
+// 500 → Server error message
+```
+
+## 🎯 Key Features
+
+### Dashboard
+- **Real-time Domain Status**: Live monitoring of domain security
+- **Compliance Scoring**: Automated security assessment
+- **Quick Actions**: One-click domain management
+- **Statistics Overview**: Comprehensive security metrics
+
+### Domain Management
+- **CRUD Operations**: Full domain lifecycle management
+- **DNS Record Management**: SPF, DKIM, DMARC configuration
+- **Bulk Operations**: Mass domain updates
+- **Tag-based Organization**: Flexible domain categorization
+
+### User Management (Admin)
+- **Role Assignment**: Granular permission control
+- **Company Management**: Multi-tenant organization
+- **Audit Logging**: Complete action tracking
+- **Access Control**: Fine-grained security permissions
+
+### Security Monitoring
+- **Real-time DNS Validation**: Live record checking
+- **Threat Intelligence**: Security threat analysis
+- **Compliance Reporting**: Automated security reports
+- **Alert System**: Proactive security notifications
+
+## 🔄 State Management
+
+### Authentication Flow
+1. **Login**: POST to `/auth/auth/` with credentials
+2. **Session**: HttpOnly cookie automatically set
+3. **Requests**: Cookies included automatically
+4. **Logout**: POST to `/auth/auth/` + cookie cleanup
+5. **Auto-logout**: 401 responses trigger logout
+
+### Error Handling
+- **Network Errors**: Graceful degradation in DEV mode
+- **Authentication Errors**: Automatic logout and redirect
+- **Validation Errors**: User-friendly form feedback
+- **Server Errors**: Informative error messages
+
+## 🧪 Testing
+
+### Development Testing
+```bash
+# Start with mock data
+VITE_USE_MOCK_DATA=true npm run dev
+
+# Test with real backend
+VITE_USE_MOCK_DATA=false npm run dev
+```
+
+### Authentication Testing
+- **DEV Mode**: Login form pre-filled for quick testing
+- **Mock Users**: Predefined user roles and permissions
+- **Session Simulation**: Cookie-based session simulation
+
+## 📦 Build & Deploy
+
+### Production Build
+```bash
 # Build for production
 npm run build
+
+# Preview production build
+npm run preview
 ```
 
 ### Environment Variables
-Create a `.env` file:
+```env
+# Production configuration
+VITE_API_BASE_URL=https://api.yourdomain.com/api/v1
+VITE_USE_MOCK_DATA=false
+VITE_DEV_MODE=false
 ```
-VITE_API_URL=http://127.0.0.1:8000/api
+
+## 🔍 Troubleshooting
+
+### Common Issues
+
+**Authentication not working:**
+- Check backend CORS configuration
+- Verify cookie domain settings
+- Ensure `withCredentials: true` in requests
+
+**Network errors in development:**
+- Set `VITE_USE_MOCK_DATA=true` for offline development
+- Check backend server is running
+- Verify API_BASE_URL configuration
+
+**Permission denied errors:**
+- Check user role and permissions
+- Verify protected route configuration
+- Review backend permission system
+
+### Debug Mode
+Enable detailed logging:
+```javascript
+// In development, all requests/responses are logged
+console.log('🔄 GET /api/v1/auth/profile', response.data);
 ```
 
-## 🧪 Development Workflow
+## 🤝 Contributing
 
-1. **Adding a new feature**:
-   - Create types in `/src/types/`
-   - Add API service in `/src/lib/api/`
-   - Create custom hook in `/src/hooks/`
-   - Build UI components in `/src/components/`
-   - Create page component in `/src/pages/`
+1. **Security First**: Always use HttpOnly cookies for authentication
+2. **Constants Usage**: Use `constants.js` for all endpoints
+3. **Error Handling**: Implement comprehensive error handling
+4. **Permission Checks**: Always verify user permissions
+5. **Mock Data**: Provide development fallbacks
 
-2. **Adding a new API endpoint**:
-   - Define types in `/src/types/`
-   - Add endpoint to constants
-   - Implement in appropriate API service
-   - Create or update custom hook
-   - Use in components
+## 📄 License
 
-## 📦 Key Dependencies
-
-- **React 18**: UI framework with modern features
-- **React Router**: Client-side routing
-- **Framer Motion**: Animations and transitions
-- **Axios**: HTTP client with interceptors
-- **Lucide React**: Icon library
-- **Chart.js**: Data visualization
-- **Tailwind CSS**: Utility-first CSS framework
-
-## 🔒 Security Features
-
-- Input sanitization in all API calls
-- XSS protection through input validation
-- JWT token management with automatic refresh
-- Protected routes with authentication checks
-- CSRF protection through proper headers
-
-## 📈 Performance Optimizations
-
-- Code splitting with React.lazy (ready for implementation)
-- Memoization with React.memo where appropriate
-- Efficient re-rendering with proper dependency arrays
-- Image optimization and lazy loading
-- Bundle size optimization with tree shaking
-
-This architecture provides a solid foundation for a scalable, maintainable email security platform while keeping the code organized and developer-friendly.
+This project is proprietary software. All rights reserved.
