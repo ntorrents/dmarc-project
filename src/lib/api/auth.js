@@ -162,8 +162,10 @@ export const authAPI = {
 
     try {
       const response = await axiosInstance.get(API_ENDPOINTS.AUTH.PROFILE);
+      console.log('Auth check response:', response.data); // Debug log
       return { authenticated: true, user: response.data };
     } catch (error) {
+      console.log('Auth check failed:', error.response?.status); // Debug log
       return { authenticated: false, user: null };
     }
   }

@@ -17,14 +17,30 @@ import { getErrorMessage } from "../lib/helpers";
 import AddDomainModal from "../components/modals/AddDomainModal";
 import { Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { useAuthContext } from "../context/AuthContext";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const Dashboard = () => {
+	const { user } = useAuthContext();
 	const [domains, setDomains] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
 	const [showAddDomain, setShowAddDomain] = useState(false);
+
+	// Get user display name
+	const getUserDisplayName = () => {
+		if (user?.first_name && user?.last_name) {
+			return `${user.first_name} ${user.last_name}`;
+		}
+		if (user?.name) {
+			return user.name;
+		}
+		if (user?.username) {
+			return user.username;
+		}
+		return "User";
+	};
 
 	const stats = [
 		{
@@ -353,7 +369,7 @@ const Dashboard = () => {
 						<div className="flex items-center justify-between">
 							<div>
 								<h1 className="text-2xl md:text-3xl font-bold mb-2">
-									Welcome back, {localStorage.getItem("userName") || "User"}!
+									Welcome back, {getUserDisplayName()}!
 								</h1>
 								<p className="text-primary-100">
 									Here is your email security overview for today

@@ -26,10 +26,11 @@ const DashboardHeader = () => {
 	const { user, logout } = useAuthContext();
 	const { success, error } = useNotification();
 	
-	// Use mock data in development if user is not available
-	const isDev = import.meta.env.MODE === "development";
-	const userName = user?.name || (isDev ? "Dev User" : "John Doe");
-	const userEmail = user?.email || (isDev ? "dev@example.com" : "john@example.com");
+	// Get user information from authenticated user
+	const userName = user?.first_name && user?.last_name 
+		? `${user.first_name} ${user.last_name}` 
+		: user?.username || user?.name || "User";
+	const userEmail = user?.email || "user@example.com";
 
 	const handleLogout = async () => {
 		try {
@@ -53,11 +54,6 @@ const DashboardHeader = () => {
 		} catch (err) {
 			console.error("Logout failed:", err);
 			error("Logout failed", "There was an error logging out. Please try again.");
-			
-			// In development, still navigate to login even if logout fails
-			if (isDev) {
-				navigate("/login");
-			}
 		}
 	};
 

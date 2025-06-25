@@ -16,6 +16,7 @@ export const useAuth = () => {
       const authResult = await authAPI.checkAuth();
       
       if (authResult.authenticated) {
+        console.log('User authenticated:', authResult.user); // Debug log
         setUser(authResult.user);
       } else {
         setUser(null);
@@ -44,6 +45,7 @@ export const useAuth = () => {
       // Get updated user profile after login
       const authResult = await authAPI.checkAuth();
       if (authResult.authenticated) {
+        console.log('User logged in:', authResult.user); // Debug log
         setUser(authResult.user);
       }
 

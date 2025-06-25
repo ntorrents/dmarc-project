@@ -70,13 +70,19 @@ const UserProfile = () => {
       }
       
       // Production API calls
-      const [profileData, orgData] = await Promise.all([
-        authAPI.getProfile(),
-        companiesAPI.get().catch(() => null) // Only admins can access this
-      ])
+      // Use user data from context if available, otherwise fetch from API
+      let profileData = user;
+      if (!profileData) {
+        profileData = await authAPI.getProfile();
+      }
+      
+      // Try to get organization data (only admins can access this)
+      const orgData = await companiesAPI.get().catch(() => null);
       
       setProfile({
-        name: profileData.name,
+        name: profileData.first_name && profileData.last_name 
+          ? `${profileData.first_name} ${profileData.last_name}` 
+          : profileData.username || profileData.name || '',
         email: profileData.email,
         currentPassword: '',
         newPassword: '',
@@ -86,6 +92,9 @@ const UserProfile = () => {
       if (orgData) {
         setOrganization(orgData)
         setIsAdmin(true)
+      } else {
+        // Check if user has admin role
+        setIsAdmin(profileData.role === 'client_admin' || profileData.role === 'super_admin')
       }
     } catch (err) {
       console.error('Error loading profile:', err)
