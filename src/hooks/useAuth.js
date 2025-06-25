@@ -17,35 +17,41 @@ export const useAuth = () => {
 			setLoading(true);
 			setError(null);
 
-			// In development mode with mock data, create a mock user
 			if (IS_DEV) {
 				const mockUser = {
 					id: 1,
 					name: "Dev User",
 					email: "dev@example.com",
-					role: "admin"
+					role: "admin",
 				};
 				setUser(mockUser);
 				setLoading(false);
 				return;
 			}
 
-			// Production mode or real backend - use real authentication
+			// Si no hay token, no hacer llamada perfil
+			const token = localStorage.getItem("token");
+			if (!token) {
+				setUser(null);
+				setLoading(false);
+				return;
+			}
+
 			const profile = await authAPI.getProfile();
 			setUser(profile);
 		} catch (error) {
 			console.error("Auth check failed:", error);
-			
-			// Check if it's a network error
-			if (error.code === 'ERR_NETWORK' || error.message === 'Network Error') {
-				setError("Unable to connect to backend server. Please ensure your backend is running.");
+
+			if (error.code === "ERR_NETWORK" || error.message === "Network Error") {
+				setError(
+					"Unable to connect to backend server. Please ensure your backend is running."
+				);
 			} else if (error.response?.status === 401) {
-				// Unauthorized - user not logged in, this is expected
-				setError(null);
+				setError(null); // No logged in
 			} else {
 				setError(getErrorMessage(error));
 			}
-			
+
 			setUser(null);
 		} finally {
 			setLoading(false);
@@ -57,20 +63,21 @@ export const useAuth = () => {
 			setError(null);
 			setLoading(true);
 
-			// In development mode with mock data, simulate successful login
 			if (IS_DEV) {
 				const mockUser = {
 					id: 1,
-					name: credentials.email.split('@')[0] || "Dev User",
+					name: credentials.email.split("@")[0] || "Dev User",
 					email: credentials.email,
-					role: "admin"
+					role: "admin",
 				};
 				setUser(mockUser);
 				return mockUser;
 			}
 
-			// Production mode or real backend - use real authentication
-			const response = await authAPI.login(credentials);
+			// login devuelve tokens y los guarda en localStorage
+			await authAPI.login(credentials);
+
+			// Luego cargar perfil
 			const profile = await authAPI.getProfile();
 			setUser(profile);
 
@@ -87,8 +94,6 @@ export const useAuth = () => {
 	const logout = async () => {
 		try {
 			setLoading(true);
-			
-			// In development mode with mock data, just clear the user
 			if (!IS_DEV) {
 				await authAPI.logout();
 			}
@@ -97,9 +102,8 @@ export const useAuth = () => {
 		} finally {
 			setUser(null);
 			setLoading(false);
-
-			// Clear localStorage
 			localStorage.removeItem("token");
+			localStorage.removeItem("refreshToken");
 			localStorage.removeItem("userName");
 			localStorage.removeItem("userEmail");
 		}
@@ -108,15 +112,13 @@ export const useAuth = () => {
 	const updateProfile = async (data) => {
 		try {
 			setError(null);
-			
-			// In development mode with mock data, just update the mock user
+
 			if (IS_DEV) {
 				const updatedUser = { ...user, ...data };
 				setUser(updatedUser);
 				return updatedUser;
 			}
 
-			// Production mode or real backend - use real API
 			const updatedUser = await authAPI.updateProfile(data);
 			setUser(updatedUser);
 			return updatedUser;

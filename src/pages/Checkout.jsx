@@ -25,8 +25,8 @@ const Checkout = () => {
 
 	const planDetails = {
 		Basic: {
-			monthlyPrice: 99,
-			yearlyPrice: 990,
+			monthlyPrice: 49,
+			yearlyPrice: 490,
 			features: [
 				"1 Domain",
 				"1 User",
@@ -36,8 +36,8 @@ const Checkout = () => {
 			],
 		},
 		Standard: {
-			monthlyPrice: 199,
-			yearlyPrice: 1990,
+			monthlyPrice: 99,
+			yearlyPrice: 990,
 			features: [
 				"3 Domains",
 				"5 Users",
@@ -49,8 +49,8 @@ const Checkout = () => {
 			],
 		},
 		Premium: {
-			monthlyPrice: 299,
-			yearlyPrice: 2990,
+			monthlyPrice: 249,
+			yearlyPrice: 2490,
 			features: [
 				"Unlimited Domains",
 				"10 Users",
