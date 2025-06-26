@@ -65,6 +65,8 @@ axiosInstance.interceptors.response.use(
 		// Handle authentication errors
 		if (error.response?.status === 401) {
 			console.warn("🔒 Authentication failed - redirecting to login");
+			console.log("Request URL:", error.config?.url);
+			console.log("Request method:", error.config?.method);
 
 			// Clear any client-side auth state
 			window.dispatchEvent(new CustomEvent("auth:logout"));
@@ -78,18 +80,21 @@ axiosInstance.interceptors.response.use(
 		// Handle forbidden access
 		if (error.response?.status === 403) {
 			console.warn("🚫 Access forbidden");
+			console.log("Request URL:", error.config?.url);
 			throw new Error("You do not have permission to perform this action.");
 		}
 
 		// Handle server errors
 		if (error.response?.status >= 500) {
 			console.error("🔥 Server error:", error.response);
+			console.log("Request URL:", error.config?.url);
 			throw new Error("Server error. Please try again later.");
 		}
 
 		// Handle validation errors
 		if (error.response?.status === 400) {
 			const errorData = error.response.data;
+			console.log("Validation error:", errorData);
 			if (errorData && typeof errorData === "object") {
 				// Extract validation errors
 				const validationErrors = Object.entries(errorData)

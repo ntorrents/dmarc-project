@@ -4,7 +4,8 @@ export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 // Environment Configuration
 export const IS_DEV =
 	import.meta.env.MODE === "development" &&
-	import.meta.env.VITE_USE_MOCK_DATA === "true";
+	(import.meta.env.VITE_USE_MOCK_DATA === "true" ||
+		import.meta.env.VITE_DEV_MODE === "true");
 export const IS_PROD = !IS_DEV;
 
 // API Endpoints - Single Source of Truth
