@@ -1,22 +1,8 @@
 import axiosInstance from "../axios";
-import { API_ENDPOINTS, IS_DEV } from "../constants";
+import { API_ENDPOINTS } from "../constants";
+import { DEV_CONFIG, MOCK_DATA, simulateDelay, devLog } from "../devConfig";
 import { clearAuthCookies } from "../axios";
 
-// Mock data for development
-const MOCK_USER = {
-	id: 1,
-	username: "dev@example.com",
-	email: "dev@example.com",
-	first_name: "Dev",
-	last_name: "User",
-	role: "client_admin",
-	company: {
-		id: 1,
-		name: "Example Corp",
-		email: "contact@example.com",
-	},
-	permissions: ["view_domains", "manage_domains", "view_users", "manage_users"],
-};
 
 export const authAPI = {
 	/**
@@ -24,11 +10,12 @@ export const authAPI = {
 	 * Uses HttpOnly cookies for session management
 	 */
 	login: async (credentials) => {
-		if (IS_DEV) {
+		if (DEV_CONFIG.USE_MOCK_AUTH) {
 			// Mock login for development
-			console.log("🔧 DEV MODE: Mock login", credentials);
+			devLog("Mock login", credentials);
+			await simulateDelay();
 			return {
-				user: MOCK_USER,
+				user: MOCK_DATA.USER,
 				message: "Login successful",
 			};
 		}
@@ -54,8 +41,9 @@ export const authAPI = {
 	 * Logout user and clear session
 	 */
 	logout: async () => {
-		if (IS_DEV) {
-			console.log("🔧 DEV MODE: Mock logout");
+		if (DEV_CONFIG.USE_MOCK_AUTH) {
+			devLog("Mock logout");
+			await simulateDelay();
 			clearAuthCookies();
 			return { message: "Logout successful" };
 		}
@@ -84,9 +72,10 @@ export const authAPI = {
 	 * Get current user profile
 	 */
 	getProfile: async () => {
-		if (IS_DEV) {
-			console.log("🔧 DEV MODE: Mock profile");
-			return MOCK_USER;
+		if (DEV_CONFIG.USE_MOCK_AUTH) {
+			devLog("Mock profile");
+			await simulateDelay();
+			return MOCK_DATA.USER;
 		}
 
 		try {
@@ -102,9 +91,10 @@ export const authAPI = {
 	 * Update user profile
 	 */
 	updateProfile: async (profileData) => {
-		if (IS_DEV) {
-			console.log("🔧 DEV MODE: Mock profile update", profileData);
-			return { ...MOCK_USER, ...profileData };
+		if (DEV_CONFIG.USE_MOCK_AUTH) {
+			devLog("Mock profile update", profileData);
+			await simulateDelay();
+			return { ...MOCK_DATA.USER, ...profileData };
 		}
 
 		try {
@@ -124,10 +114,11 @@ export const authAPI = {
 	 * Register new user
 	 */
 	register: async (userData) => {
-		if (IS_DEV) {
-			console.log("🔧 DEV MODE: Mock registration", userData);
+		if (DEV_CONFIG.USE_MOCK_AUTH) {
+			devLog("Mock registration", userData);
+			await simulateDelay();
 			return {
-				user: { ...MOCK_USER, ...userData },
+				user: { ...MOCK_DATA.USER, ...userData },
 				message: "Registration successful",
 			};
 		}
@@ -148,8 +139,9 @@ export const authAPI = {
 	 * Refresh session (if using JWT with refresh tokens)
 	 */
 	refreshSession: async () => {
-		if (IS_DEV) {
-			console.log("🔧 DEV MODE: Mock session refresh");
+		if (DEV_CONFIG.USE_MOCK_AUTH) {
+			devLog("Mock session refresh");
+			await simulateDelay();
 			return { message: "Session refreshed" };
 		}
 
@@ -171,9 +163,10 @@ export const authAPI = {
 	 * Check if user is authenticated
 	 */
 	checkAuth: async () => {
-		if (IS_DEV) {
-			console.log("🔧 DEV MODE: Mock auth check");
-			return { authenticated: true, user: MOCK_USER };
+		if (DEV_CONFIG.USE_MOCK_AUTH) {
+			devLog("Mock auth check");
+			await simulateDelay();
+			return { authenticated: true, user: MOCK_DATA.USER };
 		}
 
 		try {

@@ -52,23 +52,11 @@ const Reports = () => {
 		setLoading(true);
 
 		try {
-			const isDev = import.meta.env.MODE === "development";
-
-			if (isDev) {
-				// Simulate API call in dev mode
-				setTimeout(() => {
-					setLoading(false);
-				}, 1000);
-				return;
-			}
-
-			// In production, you would make actual API calls here
-			// For now, we'll simulate the data loading
 			console.log("Loading reports from API...");
-
-			// TODO: Replace with actual API calls when backend endpoints are ready
-			// const reportsData = await reportsAPI.getReports({ dateRange, reportType, selectedDomains })
-
+			
+			// TODO: Implement actual API calls when backend endpoints are ready
+			// For now, we'll show a message that this feature is coming soon
+			
 			setTimeout(() => {
 				setLoading(false);
 			}, 1000);

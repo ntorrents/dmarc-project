@@ -31,22 +31,11 @@ const ThreatIntelligence = () => {
 		setLoading(true);
 
 		try {
-			const isDev = import.meta.env.MODE === "development";
-
-			if (isDev) {
-				// Simulate API call in dev mode
-				setTimeout(() => {
-					setLoading(false);
-				}, 1000);
-				return;
-			}
-
-			// In production, you would make actual API calls here
 			console.log("Loading threat intelligence from API...");
-
-			// TODO: Replace with actual API calls when backend endpoints are ready
-			// const threatData = await threatAPI.getThreatIntelligence({ activeTab, threatFilter, timeRange })
-
+			
+			// TODO: Implement actual API calls when backend endpoints are ready
+			// For now, we'll show a message that this feature is coming soon
+			
 			setTimeout(() => {
 				setLoading(false);
 			}, 1000);

@@ -1,56 +1,18 @@
 import axiosInstance from "../axios";
-import { API_ENDPOINTS, IS_DEV } from "../constants";
-
-// Mock data for development
-const MOCK_DOMAINS = [
-	{
-		id: 1,
-		nombre: "example.com",
-		cliente: 1,
-		activo: true,
-		status: "active",
-		compliance_level: "high",
-		dmarc_policy: "quarantine",
-		notification_email: "admin@example.com",
-		notify_on_changes: true,
-		notify_on_expiration: true,
-		tags: ["production", "main"],
-		created_at: "2024-01-01T00:00:00Z",
-		updated_at: "2024-01-15T10:30:00Z",
-		last_check: "2024-01-15T10:30:00Z",
-		dns_records_count: 3,
-		compliance_score: 92,
-	},
-	{
-		id: 2,
-		nombre: "staging.example.com",
-		cliente: 1,
-		activo: true,
-		status: "warning",
-		compliance_level: "medium",
-		dmarc_policy: "none",
-		notification_email: "admin@example.com",
-		notify_on_changes: true,
-		notify_on_expiration: false,
-		tags: ["staging"],
-		created_at: "2024-01-05T00:00:00Z",
-		updated_at: "2024-01-14T15:45:00Z",
-		last_check: "2024-01-14T15:45:00Z",
-		dns_records_count: 2,
-		compliance_score: 67,
-	},
-];
+import { API_ENDPOINTS } from "../constants";
+import { DEV_CONFIG, MOCK_DATA, simulateDelay, devLog, devError } from "../devConfig";
 
 export const domainsAPI = {
 	/**
 	 * Get all domains for the current user/client
 	 */
 	list: async (filters = {}) => {
-		if (IS_DEV) {
-			console.log("🔧 DEV MODE: Mock domains list", filters);
+		if (DEV_CONFIG.USE_MOCK_DOMAINS) {
+			devLog("Using mock domains data", filters);
+			await simulateDelay();
 
 			// Apply mock filters
-			let filteredDomains = [...MOCK_DOMAINS];
+			let filteredDomains = [...MOCK_DATA.DOMAINS];
 
 			if (filters.search) {
 				filteredDomains = filteredDomains.filter(
@@ -85,10 +47,8 @@ export const domainsAPI = {
 		}
 
 		try {
-			console.log(
-				"Making API request to domains endpoint with filters:",
-				filters
-			);
+			devLog("Making API request to domains endpoint with filters:", filters);
+			
 			const params = new URLSearchParams();
 			Object.entries(filters).forEach(([key, value]) => {
 				if (value !== undefined && value !== null && value !== "") {
@@ -105,9 +65,9 @@ export const domainsAPI = {
 				? `${API_ENDPOINTS.PANEL.DOMAINS}?${queryString}`
 				: API_ENDPOINTS.PANEL.DOMAINS;
 
-			console.log("Domains API URL:", url);
+			devLog("Domains API URL:", url);
 			const response = await axiosInstance.get(url);
-			console.log("Domains API response:", response.data);
+			devLog("Domains API response:", response.data);
 
 			// Handle different response formats
 			if (response.data.results) {
@@ -121,8 +81,8 @@ export const domainsAPI = {
 				return response.data;
 			}
 		} catch (error) {
-			console.error("Get domains failed:", error);
-			console.error("Error details:", error.response?.data);
+			devError("Get domains failed:", error);
+			devError("Error details:", error.response?.data);
 			throw error;
 		}
 	},
@@ -131,9 +91,11 @@ export const domainsAPI = {
 	 * Get domain by ID
 	 */
 	get: async (id) => {
-		if (IS_DEV) {
-			console.log("🔧 DEV MODE: Mock domain get", id);
-			const domain = MOCK_DOMAINS.find((d) => d.id === parseInt(id));
+		if (DEV_CONFIG.USE_MOCK_DOMAINS) {
+			devLog("Using mock domain get", id);
+			await simulateDelay();
+			
+			const domain = MOCK_DATA.DOMAINS.find((d) => d.id === parseInt(id));
 			if (!domain) {
 				throw new Error("Domain not found");
 			}
@@ -146,7 +108,7 @@ export const domainsAPI = {
 			);
 			return response.data;
 		} catch (error) {
-			console.error("Get domain failed:", error);
+			devError("Get domain failed:", error);
 			throw error;
 		}
 	},
@@ -155,8 +117,10 @@ export const domainsAPI = {
 	 * Create new domain
 	 */
 	create: async (domainData) => {
-		if (IS_DEV) {
-			console.log("🔧 DEV MODE: Mock domain create", domainData);
+		if (DEV_CONFIG.USE_MOCK_DOMAINS) {
+			devLog("Using mock domain create", domainData);
+			await simulateDelay();
+			
 			const newDomain = {
 				id: Date.now(),
 				...domainData,
@@ -181,7 +145,7 @@ export const domainsAPI = {
 			);
 			return response.data;
 		} catch (error) {
-			console.error("Create domain failed:", error);
+			devError("Create domain failed:", error);
 			throw error;
 		}
 	},
@@ -190,9 +154,11 @@ export const domainsAPI = {
 	 * Update domain
 	 */
 	update: async (id, domainData) => {
-		if (IS_DEV) {
-			console.log("🔧 DEV MODE: Mock domain update", id, domainData);
-			const domain = MOCK_DOMAINS.find((d) => d.id === parseInt(id));
+		if (DEV_CONFIG.USE_MOCK_DOMAINS) {
+			devLog("Using mock domain update", id, domainData);
+			await simulateDelay();
+			
+			const domain = MOCK_DATA.DOMAINS.find((d) => d.id === parseInt(id));
 			if (!domain) {
 				throw new Error("Domain not found");
 			}
@@ -206,7 +172,7 @@ export const domainsAPI = {
 			);
 			return response.data;
 		} catch (error) {
-			console.error("Update domain failed:", error);
+			devError("Update domain failed:", error);
 			throw error;
 		}
 	},
@@ -215,8 +181,9 @@ export const domainsAPI = {
 	 * Delete domain
 	 */
 	delete: async (id) => {
-		if (IS_DEV) {
-			console.log("🔧 DEV MODE: Mock domain delete", id);
+		if (DEV_CONFIG.USE_MOCK_DOMAINS) {
+			devLog("Using mock domain delete", id);
+			await simulateDelay();
 			return { message: "Domain deleted successfully" };
 		}
 
@@ -226,7 +193,7 @@ export const domainsAPI = {
 			);
 			return response.data;
 		} catch (error) {
-			console.error("Delete domain failed:", error);
+			devError("Delete domain failed:", error);
 			throw error;
 		}
 	},
@@ -235,15 +202,17 @@ export const domainsAPI = {
 	 * Get domain DNS records
 	 */
 	getDNSRecords: async (id) => {
-		if (IS_DEV) {
-			console.log("🔧 DEV MODE: Mock DNS records", id);
+		if (DEV_CONFIG.USE_MOCK_DOMAINS) {
+			devLog("Using mock DNS records", id);
+			await simulateDelay();
+			
 			return [
 				{
 					id: 1,
 					domain: parseInt(id),
 					type: "DMARC",
 					name: `_dmarc.${
-						MOCK_DOMAINS.find((d) => d.id === parseInt(id))?.nombre
+						MOCK_DATA.DOMAINS.find((d) => d.id === parseInt(id))?.nombre
 					}`,
 					value: "v=DMARC1; p=quarantine; rua=mailto:dmarc@example.com",
 					ttl: 3600,
@@ -254,7 +223,7 @@ export const domainsAPI = {
 					id: 2,
 					domain: parseInt(id),
 					type: "SPF",
-					name: MOCK_DOMAINS.find((d) => d.id === parseInt(id))?.nombre,
+					name: MOCK_DATA.DOMAINS.find((d) => d.id === parseInt(id))?.nombre,
 					value: "v=spf1 include:_spf.google.com ~all",
 					ttl: 3600,
 					status: "valid",
@@ -269,7 +238,7 @@ export const domainsAPI = {
 			);
 			return response.data;
 		} catch (error) {
-			console.error("Get DNS records failed:", error);
+			devError("Get DNS records failed:", error);
 			throw error;
 		}
 	},
@@ -278,8 +247,10 @@ export const domainsAPI = {
 	 * Check domain DNS configuration
 	 */
 	checkDNS: async (id) => {
-		if (IS_DEV) {
-			console.log("🔧 DEV MODE: Mock DNS check", id);
+		if (DEV_CONFIG.USE_MOCK_DOMAINS) {
+			devLog("Using mock DNS check", id);
+			await simulateDelay();
+			
 			return {
 				domain_id: parseInt(id),
 				status: "completed",
@@ -302,7 +273,7 @@ export const domainsAPI = {
 			);
 			return response.data;
 		} catch (error) {
-			console.error("DNS check failed:", error);
+			devError("DNS check failed:", error);
 			throw error;
 		}
 	},
@@ -311,12 +282,14 @@ export const domainsAPI = {
 	 * Get domain statistics
 	 */
 	getStats: async () => {
-		if (IS_DEV) {
-			console.log("🔧 DEV MODE: Mock domain stats");
+		if (DEV_CONFIG.USE_MOCK_DOMAINS) {
+			devLog("Using mock domain stats");
+			await simulateDelay();
+			
 			return {
-				total_domains: MOCK_DOMAINS.length,
-				active_domains: MOCK_DOMAINS.filter((d) => d.activo).length,
-				protected_domains: MOCK_DOMAINS.filter((d) => d.dmarc_policy !== "none")
+				total_domains: MOCK_DATA.DOMAINS.length,
+				active_domains: MOCK_DATA.DOMAINS.filter((d) => d.activo).length,
+				protected_domains: MOCK_DATA.DOMAINS.filter((d) => d.dmarc_policy !== "none")
 					.length,
 				average_compliance: 79.5,
 				recent_checks: 15,
@@ -330,7 +303,7 @@ export const domainsAPI = {
 			);
 			return response.data;
 		} catch (error) {
-			console.error("Get domain stats failed:", error);
+			devError("Get domain stats failed:", error);
 			throw error;
 		}
 	},

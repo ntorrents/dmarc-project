@@ -113,71 +113,22 @@ const Dashboard = () => {
 			setLoading(true);
 			setError(null);
 
-			const isDev = import.meta.env.MODE === "development";
-
-			if (isDev) {
-				// Mock data for development
-				setTimeout(() => {
-					setDomains([
-						{
-							id: 1,
-							name: "example.com",
-							status: "protected",
-							policy: "quarantine",
-							compliance: 92,
-							lastCheck: "2 hours ago",
-							emails: "1,234",
-							tag: "production",
-						},
-						{
-							id: 2,
-							name: "mycompany.org",
-							status: "warning",
-							policy: "none",
-							compliance: 67,
-							lastCheck: "1 day ago",
-							emails: "856",
-							tag: "staging",
-						},
-						{
-							id: 3,
-							name: "business.net",
-							status: "error",
-							policy: "none",
-							compliance: 34,
-							lastCheck: "3 days ago",
-							emails: "432",
-							tag: "development",
-						},
-						{
-							id: 4,
-							name: "shop.io",
-							status: "protected",
-							policy: "reject",
-							compliance: 98,
-							lastCheck: "1 hour ago",
-							emails: "2,156",
-							tag: "ecommerce",
-						},
-						{
-							id: 5,
-							name: "blog.com",
-							status: "warning",
-							policy: "quarantine",
-							compliance: 75,
-							lastCheck: "3 hours ago",
-							emails: "543",
-							tag: "content",
-						},
-					]);
-					setLoading(false);
-				}, 1000);
-				return;
-			}
-
-			// Production API call
+			// Get domains from API
 			const data = await domainsAPI.list();
-			setDomains(data);
+			
+			// Transform API data to match UI expectations
+			const transformedDomains = Array.isArray(data) ? data.map(domain => ({
+				id: domain.id,
+				name: domain.nombre || domain.name,
+				status: mapDomainStatus(domain.status, domain.compliance_level),
+				policy: domain.dmarc_policy || 'none',
+				compliance: domain.compliance_score || 0,
+				lastCheck: formatLastCheck(domain.last_check),
+				emails: domain.email_count || 0,
+				tag: Array.isArray(domain.tags) ? domain.tags[0] : (domain.tag || 'untagged'),
+			})) : [];
+			
+			setDomains(transformedDomains);
 		} catch (err) {
 			console.error("Error loading domains:", err);
 			setError(getErrorMessage(err));
@@ -186,30 +137,48 @@ const Dashboard = () => {
 		}
 	};
 
+	// Helper function to map domain status
+	const mapDomainStatus = (status, complianceLevel) => {
+		if (status === 'active' && complianceLevel === 'high') return 'protected';
+		if (status === 'active' && complianceLevel === 'medium') return 'warning';
+		if (status === 'active' && complianceLevel === 'low') return 'error';
+		return status || 'error';
+	};
+
+	// Helper function to format last check time
+	const formatLastCheck = (lastCheck) => {
+		if (!lastCheck) return 'Never';
+		const now = new Date();
+		const checkTime = new Date(lastCheck);
+		const diffInMinutes = Math.floor((now - checkTime) / (1000 * 60));
+		
+		if (diffInMinutes < 60) return `${diffInMinutes} minutes ago`;
+		if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)} hours ago`;
+		return `${Math.floor(diffInMinutes / 1440)} days ago`;
+	};
+
 	const handleAddDomain = async (domainData) => {
 		try {
-			const isDev = import.meta.env.MODE === "development";
-
-			if (isDev) {
-				// Mock domain creation
-				const newDomain = {
-					id: Date.now(),
-					name: domainData.name,
-					status: "warning",
-					policy: "none",
-					compliance: 0,
-					lastCheck: "Just added",
-					emails: "0",
-					tag: domainData.tag || "new",
-				};
-				setDomains((prev) => [...prev, newDomain]);
-				setShowAddDomain(false);
-				return;
-			}
-
-			// Production API call
-			const newDomain = await domainsAPI.create(domainData);
-			setDomains((prev) => [...prev, newDomain]);
+			// Create domain via API
+			const createdDomain = await domainsAPI.create({
+				nombre: domainData.name,
+				description: domainData.description,
+				tags: domainData.tag ? [domainData.tag] : [],
+			});
+			
+			// Transform and add to local state
+			const transformedDomain = {
+				id: createdDomain.id,
+				name: createdDomain.nombre || createdDomain.name,
+				status: 'warning',
+				policy: 'none',
+				compliance: 0,
+				lastCheck: 'Just added',
+				emails: 0,
+				tag: domainData.tag || 'new',
+			};
+			
+			setDomains((prev) => [...prev, transformedDomain]);
 			setShowAddDomain(false);
 		} catch (err) {
 			console.error("Error adding domain:", err);

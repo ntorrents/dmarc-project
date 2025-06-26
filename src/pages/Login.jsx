@@ -4,7 +4,8 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, Shield, ArrowRight, AlertCircle } from 'lucide-react';
 import { useAuthContext } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
-import { IS_DEV, ROUTES } from '../lib/constants';
+import { ROUTES } from '../lib/constants';
+import { DEV_CONFIG } from '../lib/devConfig';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -13,8 +14,8 @@ const Login = () => {
   const { success, error: showError } = useNotification();
   
   const [formData, setFormData] = useState({
-    email: IS_DEV ? 'dev@example.com' : '',
-    password: IS_DEV ? 'password123' : '',
+    email: DEV_CONFIG.PREFILL_LOGIN_FORM ? 'dev@example.com' : '',
+    password: DEV_CONFIG.PREFILL_LOGIN_FORM ? 'password123' : '',
     rememberMe: false,
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -98,7 +99,7 @@ const Login = () => {
           </p>
           
           {/* Development Mode Notice */}
-          {IS_DEV && (
+          {DEV_CONFIG.SHOW_DEV_NOTICES && (
             <div className="mt-4 p-3 bg-yellow-500/20 rounded-lg border border-yellow-400/30">
               <div className="flex items-center justify-center space-x-2">
                 <AlertCircle className="w-4 h-4 text-yellow-200" />

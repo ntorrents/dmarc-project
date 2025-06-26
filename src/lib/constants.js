@@ -1,11 +1,11 @@
 // API Configuration and Constants
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
+// Import development configuration
+import { IS_DEV } from './devConfig';
+
 // Environment Configuration
-export const IS_DEV =
-	import.meta.env.MODE === "development" &&
-	(import.meta.env.VITE_USE_MOCK_DATA === "true" ||
-		import.meta.env.VITE_DEV_MODE === "true");
+export { IS_DEV };
 export const IS_PROD = !IS_DEV;
 
 // API Endpoints - Single Source of Truth

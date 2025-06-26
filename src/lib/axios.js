@@ -1,5 +1,6 @@
 import axios from "axios";
-import { API_BASE_URL, IS_DEV, ROUTES } from "./constants";
+import { API_BASE_URL, ROUTES } from "./constants";
+import { DEV_CONFIG, devLog, devError } from "./devConfig";
 
 // Create axios instance with secure defaults
 const axiosInstance = axios.create({
@@ -22,8 +23,8 @@ axiosInstance.interceptors.request.use(
 		}
 
 		// Log requests in development
-		if (IS_DEV) {
-			console.log(
+		if (DEV_CONFIG.ENABLE_DEBUG_LOGGING) {
+			devLog(
 				`🔄 ${config.method?.toUpperCase()} ${config.url}`,
 				config.data
 			);
@@ -41,8 +42,8 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
 	(response) => {
 		// Log successful responses in development
-		if (IS_DEV) {
-			console.log(
+		if (DEV_CONFIG.ENABLE_DEBUG_LOGGING) {
+			devLog(
 				`✅ ${response.config.method?.toUpperCase()} ${response.config.url}`,
 				response.data
 			);
@@ -52,14 +53,12 @@ axiosInstance.interceptors.response.use(
 	(error) => {
 		// Handle different error scenarios
 		if (error.code === "ERR_NETWORK" || error.message === "Network Error") {
-			console.error("🌐 Network error - backend may not be running:", error);
+			devError("🌐 Network error - backend may not be running:", error);
 
-			if (!IS_DEV) {
-				// In production, show user-friendly error
-				throw new Error(
-					"Unable to connect to server. Please check your internet connection."
-				);
-			}
+			// Show user-friendly error
+			throw new Error(
+				"Unable to connect to server. Please check your internet connection."
+			);
 		}
 
 		// Handle authentication errors
@@ -108,8 +107,8 @@ axiosInstance.interceptors.response.use(
 		}
 
 		// Log errors in development
-		if (IS_DEV) {
-			console.error(
+		if (DEV_CONFIG.ENABLE_DEBUG_LOGGING) {
+			devError(
 				`❌ ${error.config?.method?.toUpperCase()} ${error.config?.url}`,
 				error.response?.data || error.message
 			);

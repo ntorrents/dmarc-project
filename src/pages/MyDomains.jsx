@@ -62,77 +62,46 @@ const MyDomains = () => {
 			setLoading(true);
 			setError(null);
 
-			const isDev = import.meta.env.MODE === "development";
-
-			if (isDev) {
-				// Mock data for development
-				setTimeout(() => {
-					const mockDomains = [
-						{
-							id: 1,
-							name: "example.com",
-							status: "protected",
-							policy: "quarantine",
-							compliance: 92,
-							lastCheck: "2024-01-15T10:30:00Z",
-							emails: 1234,
-							tag: "production",
-							createdAt: "2024-01-01T00:00:00Z",
-							tld: "com",
-						},
-						{
-							id: 2,
-							name: "mycompany.org",
-							status: "warning",
-							policy: "none",
-							compliance: 67,
-							lastCheck: "2024-01-14T15:45:00Z",
-							emails: 856,
-							tag: "staging",
-							createdAt: "2024-01-05T00:00:00Z",
-							tld: "org",
-						},
-						{
-							id: 3,
-							name: "business.net",
-							status: "error",
-							policy: "none",
-							compliance: 34,
-							lastCheck: "2024-01-12T09:15:00Z",
-							emails: 432,
-							tag: "development",
-							createdAt: "2024-01-10T00:00:00Z",
-							tld: "net",
-						},
-						{
-							id: 4,
-							name: "shop.io",
-							status: "protected",
-							policy: "reject",
-							compliance: 98,
-							lastCheck: "2024-01-15T11:00:00Z",
-							emails: 2156,
-							tag: "ecommerce",
-							createdAt: "2023-12-15T00:00:00Z",
-							tld: "io",
-						},
-					];
-					setDomains(mockDomains);
-					setLoading(false);
-				}, 1000);
-				return;
-			}
-
 			console.log("Fetching domains from API...");
 			const data = await domainsAPI.list(filters);
 			console.log("Domains API response:", data);
-			setDomains(data);
+			
+			// Transform API data to match UI expectations
+			const transformedDomains = Array.isArray(data) ? data.map(domain => ({
+				id: domain.id,
+				name: domain.nombre || domain.name,
+				status: mapDomainStatus(domain.status, domain.compliance_level),
+				policy: domain.dmarc_policy || 'none',
+				compliance: domain.compliance_score || 0,
+				lastCheck: domain.last_check,
+				emails: domain.email_count || 0,
+				tag: Array.isArray(domain.tags) ? domain.tags[0] : (domain.tag || 'untagged'),
+				createdAt: domain.created_at,
+				tld: extractTLD(domain.nombre || domain.name),
+			})) : [];
+			
+			setDomains(transformedDomains);
 		} catch (err) {
 			console.error("Error loading domains:", err);
 			setError(getErrorMessage(err));
 		} finally {
 			setLoading(false);
 		}
+	};
+
+	// Helper function to map domain status
+	const mapDomainStatus = (status, complianceLevel) => {
+		if (status === 'active' && complianceLevel === 'high') return 'protected';
+		if (status === 'active' && complianceLevel === 'medium') return 'warning';
+		if (status === 'active' && complianceLevel === 'low') return 'error';
+		return status || 'error';
+	};
+
+	// Helper function to extract TLD
+	const extractTLD = (domain) => {
+		if (!domain) return 'com';
+		const parts = domain.split('.');
+		return parts[parts.length - 1] || 'com';
 	};
 
 	const applyFilters = () => {
@@ -215,28 +184,28 @@ const MyDomains = () => {
 
 	const handleAddDomain = async (domainData) => {
 		try {
-			const isDev = import.meta.env.MODE === "development";
-
-			if (isDev) {
-				const newDomain = {
-					id: Date.now(),
-					name: domainData.name,
-					status: "warning",
-					policy: "none",
-					compliance: 0,
-					lastCheck: new Date().toISOString(),
-					emails: 0,
-					tag: domainData.tag || "new",
-					createdAt: new Date().toISOString(),
-					tld: domainData.name.split(".").pop(),
-				};
-				setDomains((prev) => [...prev, newDomain]);
-				setShowAddDomain(false);
-				return;
-			}
-
-			const newDomain = await domainsAPI.create(domainData);
-			setDomains((prev) => [...prev, newDomain]);
+			// Create domain via API
+			const createdDomain = await domainsAPI.create({
+				nombre: domainData.name,
+				description: domainData.description,
+				tags: domainData.tag ? [domainData.tag] : [],
+			});
+			
+			// Transform and add to local state
+			const transformedDomain = {
+				id: createdDomain.id,
+				name: createdDomain.nombre || createdDomain.name,
+				status: 'warning',
+				policy: 'none',
+				compliance: 0,
+				lastCheck: new Date().toISOString(),
+				emails: 0,
+				tag: domainData.tag || 'new',
+				createdAt: new Date().toISOString(),
+				tld: extractTLD(createdDomain.nombre || createdDomain.name),
+			};
+			
+			setDomains((prev) => [...prev, transformedDomain]);
 			setShowAddDomain(false);
 		} catch (err) {
 			console.error("Error adding domain:", err);
