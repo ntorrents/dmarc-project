@@ -122,7 +122,7 @@ const DomainChecker = () => {
             Advanced DMARC Security Analyzer
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Get a comprehensive real-time analysis of your domain's email security configuration 
+            Get a comprehensive real-time analysis of your domain&apos;s email security configuration 
             with DNS validation and expert recommendations.
           </p>
         </motion.div>

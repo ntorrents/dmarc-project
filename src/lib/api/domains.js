@@ -1,6 +1,12 @@
 import axiosInstance from "../axios";
 import { API_ENDPOINTS } from "../constants";
-import { DEV_CONFIG, MOCK_DATA, simulateDelay, devLog, devError } from "../devConfig";
+import {
+	DEV_CONFIG,
+	MOCK_DATA,
+	simulateDelay,
+	devLog,
+	devError,
+} from "../devConfig";
 
 export const domainsAPI = {
 	/**
@@ -48,7 +54,7 @@ export const domainsAPI = {
 
 		try {
 			devLog("Making API request to domains endpoint with filters:", filters);
-			
+
 			const params = new URLSearchParams();
 			Object.entries(filters).forEach(([key, value]) => {
 				if (value !== undefined && value !== null && value !== "") {
@@ -94,7 +100,7 @@ export const domainsAPI = {
 		if (DEV_CONFIG.USE_MOCK_DOMAINS) {
 			devLog("Using mock domain get", id);
 			await simulateDelay();
-			
+
 			const domain = MOCK_DATA.DOMAINS.find((d) => d.id === parseInt(id));
 			if (!domain) {
 				throw new Error("Domain not found");
@@ -120,7 +126,7 @@ export const domainsAPI = {
 		if (DEV_CONFIG.USE_MOCK_DOMAINS) {
 			devLog("Using mock domain create", domainData);
 			await simulateDelay();
-			
+
 			const newDomain = {
 				id: Date.now(),
 				...domainData,
@@ -157,7 +163,7 @@ export const domainsAPI = {
 		if (DEV_CONFIG.USE_MOCK_DOMAINS) {
 			devLog("Using mock domain update", id, domainData);
 			await simulateDelay();
-			
+
 			const domain = MOCK_DATA.DOMAINS.find((d) => d.id === parseInt(id));
 			if (!domain) {
 				throw new Error("Domain not found");
@@ -205,7 +211,7 @@ export const domainsAPI = {
 		if (DEV_CONFIG.USE_MOCK_DOMAINS) {
 			devLog("Using mock DNS records", id);
 			await simulateDelay();
-			
+
 			return [
 				{
 					id: 1,
@@ -250,7 +256,7 @@ export const domainsAPI = {
 		if (DEV_CONFIG.USE_MOCK_DOMAINS) {
 			devLog("Using mock DNS check", id);
 			await simulateDelay();
-			
+
 			return {
 				domain_id: parseInt(id),
 				status: "completed",
@@ -285,12 +291,13 @@ export const domainsAPI = {
 		if (DEV_CONFIG.USE_MOCK_DOMAINS) {
 			devLog("Using mock domain stats");
 			await simulateDelay();
-			
+
 			return {
 				total_domains: MOCK_DATA.DOMAINS.length,
 				active_domains: MOCK_DATA.DOMAINS.filter((d) => d.activo).length,
-				protected_domains: MOCK_DATA.DOMAINS.filter((d) => d.dmarc_policy !== "none")
-					.length,
+				protected_domains: MOCK_DATA.DOMAINS.filter(
+					(d) => d.dmarc_policy !== "none"
+				).length,
 				average_compliance: 79.5,
 				recent_checks: 15,
 				issues_found: 3,

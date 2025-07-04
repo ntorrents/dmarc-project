@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Globe, Tag, FileText } from "lucide-react";
+import { X, Globe, FileText } from "lucide-react";
 import { validateDomain, sanitizeInput } from "../../lib/helpers";
 import PropTypes from "prop-types";
 
 const AddDomainModal = ({ onClose, onAdd }) => {
 	const [formData, setFormData] = useState({
 		name: "",
-		tag: "",
 		description: "",
 	});
 	const [loading, setLoading] = useState(false);
@@ -102,29 +101,6 @@ const AddDomainModal = ({ onClose, onAdd }) => {
 										className="input-field pl-10"
 										placeholder="example.com"
 										required
-									/>
-								</div>
-							</div>
-
-							{/* Tag */}
-							<div>
-								<label
-									htmlFor="tag"
-									className="block text-sm font-medium text-gray-700 mb-2">
-									Tag (Optional)
-								</label>
-								<div className="relative">
-									<div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-										<Tag className="h-5 w-5 text-gray-400" />
-									</div>
-									<input
-										type="text"
-										id="tag"
-										name="tag"
-										value={formData.tag}
-										onChange={handleChange}
-										className="input-field pl-10"
-										placeholder="production, staging, etc."
 									/>
 								</div>
 							</div>
