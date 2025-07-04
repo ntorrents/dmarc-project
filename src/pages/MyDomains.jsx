@@ -16,6 +16,7 @@ import { domainsAPI } from "../lib/api/domains";
 import { getErrorMessage } from "../lib/helpers";
 import AddDomainModal from "../components/modals/AddDomainModal";
 import { Link } from "react-router-dom";
+import { useNotification } from "../context/NotificationContext";
 
 const MyDomains = () => {
 	const [domains, setDomains] = useState([]);
@@ -23,6 +24,7 @@ const MyDomains = () => {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
 	const [showAddDomain, setShowAddDomain] = useState(false);
+	const { success, error: showError } = useNotification();
 
 	// Filter states
 	const [filters, setFilters] = useState({
@@ -73,17 +75,20 @@ const MyDomains = () => {
 				status: mapDomainStatus(domain.status, domain.compliance_level),
 				policy: domain.dmarc_policy || 'none',
 				compliance: domain.compliance_score || 0,
-				lastCheck: domain.last_check,
+				lastCheck: domain.last_check || new Date().toISOString(),
 				emails: domain.email_count || 0,
 				tag: Array.isArray(domain.tags) ? domain.tags[0] : (domain.tag || 'untagged'),
-				createdAt: domain.created_at,
+				createdAt: domain.created_at || new Date().toISOString(),
 				tld: extractTLD(domain.nombre || domain.name),
 			})) : [];
 			
+			console.log("Transformed domains:", transformedDomains);
 			setDomains(transformedDomains);
 		} catch (err) {
 			console.error("Error loading domains:", err);
-			setError(getErrorMessage(err));
+			const errorMessage = getErrorMessage(err);
+			setError(errorMessage);
+			showError("Failed to load domains", errorMessage);
 		} finally {
 			setLoading(false);
 		}
@@ -184,12 +189,16 @@ const MyDomains = () => {
 
 	const handleAddDomain = async (domainData) => {
 		try {
+			console.log("Adding domain:", domainData);
+			
 			// Create domain via API
 			const createdDomain = await domainsAPI.create({
 				nombre: domainData.name,
 				description: domainData.description,
 				tags: domainData.tag ? [domainData.tag] : [],
 			});
+			
+			console.log("Domain created:", createdDomain);
 			
 			// Transform and add to local state
 			const transformedDomain = {
@@ -207,8 +216,11 @@ const MyDomains = () => {
 			
 			setDomains((prev) => [...prev, transformedDomain]);
 			setShowAddDomain(false);
+			success("Domain added successfully!");
 		} catch (err) {
 			console.error("Error adding domain:", err);
+			const errorMessage = getErrorMessage(err);
+			showError("Failed to add domain", errorMessage);
 			throw err;
 		}
 	};
@@ -222,7 +234,7 @@ const MyDomains = () => {
 			case "error":
 				return <XCircle className="w-5 h-5 text-red-500" />;
 			default:
-				return null;
+				return <AlertTriangle className="w-5 h-5 text-gray-500" />;
 		}
 	};
 
@@ -240,6 +252,7 @@ const MyDomains = () => {
 	};
 
 	const formatDate = (dateString) => {
+		if (!dateString) return 'Never';
 		return new Date(dateString).toLocaleDateString("en-US", {
 			year: "numeric",
 			month: "short",
@@ -396,49 +409,6 @@ const MyDomains = () => {
 									</option>
 								))}
 							</select>
-						</div>
-
-						{/* Policy */}
-						<div>
-							<label className="block text-sm font-medium text-gray-700 mb-1">
-								DMARC Policy
-							</label>
-							<select
-								value={filters.policy}
-								onChange={(e) => handleFilterChange("policy", e.target.value)}
-								className="input-field">
-								{policyOptions.map((option) => (
-									<option key={option.value} value={option.value}>
-										{option.label}
-									</option>
-								))}
-							</select>
-						</div>
-
-						{/* Date From */}
-						<div>
-							<label className="block text-sm font-medium text-gray-700 mb-1">
-								Created From
-							</label>
-							<input
-								type="date"
-								value={filters.dateFrom}
-								onChange={(e) => handleFilterChange("dateFrom", e.target.value)}
-								className="input-field"
-							/>
-						</div>
-
-						{/* Date To */}
-						<div>
-							<label className="block text-sm font-medium text-gray-700 mb-1">
-								Created To
-							</label>
-							<input
-								type="date"
-								value={filters.dateTo}
-								onChange={(e) => handleFilterChange("dateTo", e.target.value)}
-								className="input-field"
-							/>
 						</div>
 					</div>
 				</motion.div>
