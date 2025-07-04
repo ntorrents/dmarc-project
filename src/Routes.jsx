@@ -78,7 +78,7 @@ const AppRoutes = () => {
 						<Route
 							path={ROUTES.DOMAINS}
 							element={
-								<ProtectedRoute requiredPermission="view_domains">
+								<ProtectedRoute>
 									<MyDomains />
 								</ProtectedRoute>
 							}
@@ -87,7 +87,7 @@ const AppRoutes = () => {
 						<Route
 							path="/dashboard/domains/:id"
 							element={
-								<ProtectedRoute requiredPermission="view_domains">
+								<ProtectedRoute>
 									<DomainDetail />
 								</ProtectedRoute>
 							}
@@ -96,7 +96,7 @@ const AppRoutes = () => {
 						<Route
 							path={ROUTES.REPORTS}
 							element={
-								<ProtectedRoute requiredPermission="view_reports">
+								<ProtectedRoute>
 									<Reports />
 								</ProtectedRoute>
 							}
@@ -105,7 +105,7 @@ const AppRoutes = () => {
 						<Route
 							path={ROUTES.THREATS}
 							element={
-								<ProtectedRoute requiredPermission="view_threats">
+								<ProtectedRoute>
 									<ThreatIntelligence />
 								</ProtectedRoute>
 							}
