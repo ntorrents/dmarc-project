@@ -9,7 +9,7 @@
   
   body {
     @apply font-sans text-gray-900 antialiased;
-    padding-top: 80px; /* Add padding to prevent header overlap */
+    padding-top: 64px; /* Reduced padding to prevent header overlap */
   }
 }
 

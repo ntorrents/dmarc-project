@@ -120,7 +120,7 @@ const Reports = () => {
 			exit={{ opacity: 0 }}
 			transition={{ duration: 0.3 }}
 			className="min-h-screen bg-gray-50 pt-20">
-			<div className="container-custom py-8">
+			<div className="container-custom py-6">
 				{/* Header */}
 				<motion.div
 					initial={{ opacity: 0, y: 20 }}

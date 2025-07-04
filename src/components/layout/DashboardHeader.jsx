@@ -80,9 +80,9 @@ const DashboardHeader = () => {
 		<motion.header
 			initial={{ y: -100 }}
 			animate={{ y: 0 }}
-			className="fixed top-0 left-0 right-0 z-50 bg-white shadow-lg border-b border-gray-200">
+			className="fixed top-0 left-0 right-0 z-50 bg-white shadow-lg border-b border-gray-200 mb-0">
 			<div className="container-custom">
-				<div className="flex items-center justify-between h-16 lg:h-20">
+				<div className="flex items-center justify-between h-14 lg:h-16">
 					{/* Logo */}
 					<Link to="/dashboard" className="flex items-center space-x-2">
 						<div className="flex items-center justify-center w-10 h-10 bg-gradient-primary rounded-lg">

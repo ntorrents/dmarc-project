@@ -13,6 +13,7 @@ import {
 	TrendingUp,
 } from "lucide-react";
 import { domainsAPI } from "../lib/api/domains";
+import { statsAPI } from "../lib/api/stats";
 import { getErrorMessage } from "../lib/helpers";
 import AddDomainModal from "../components/modals/AddDomainModal";
 import { Doughnut } from "react-chartjs-2";
@@ -20,12 +21,14 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { useAuthContext } from "../context/AuthContext";
 import { activityAPI } from "../lib/api/activity";
 import RecentActivity from "@/components/dashboard/RecentActivity";
+import { Link } from "react-router-dom";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const Dashboard = () => {
 	const { user } = useAuthContext();
 	const [domains, setDomains] = useState([]);
+	const [dashboardStats, setDashboardStats] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
 	const [showAddDomain, setShowAddDomain] = useState(false);
@@ -45,40 +48,74 @@ const Dashboard = () => {
 		return "User";
 	};
 
-	const stats = [
-		{
-			title: "Protected Domains",
-			value: domains.length.toString(),
-			icon: Globe,
-			color: "text-blue-600",
-			bgColor: "bg-blue-100",
-			change: "+1 this month",
-		},
-		{
-			title: "Active Users",
-			value: "5",
-			icon: Users,
-			color: "text-green-600",
-			bgColor: "bg-green-100",
-			change: "+2 this week",
-		},
-		{
-			title: "DMARC Compliance",
-			value: "87%",
-			icon: Shield,
-			color: "text-primary-600",
-			bgColor: "bg-primary-100",
-			change: "+5% this month",
-		},
-		{
-			title: "Threats Blocked",
-			value: "142",
-			icon: BarChart3,
-			color: "text-red-600",
-			bgColor: "bg-red-100",
-			change: "+23 today",
-		},
-	];
+	// Generate stats from API data
+	const getStats = () => {
+		if (!dashboardStats) {
+			return [
+				{
+					title: "Protected Domains",
+					value: domains.length.toString(),
+					icon: Globe,
+					color: "text-blue-600",
+					bgColor: "bg-blue-100",
+				},
+				{
+					title: "Active Users",
+					value: "Loading...",
+					icon: Users,
+					color: "text-green-600",
+					bgColor: "bg-green-100",
+				},
+				{
+					title: "DMARC Compliance",
+					value: "Loading...",
+					icon: Shield,
+					color: "text-primary-600",
+					bgColor: "bg-primary-100",
+				},
+				{
+					title: "Threats Blocked",
+					value: "142",
+					icon: BarChart3,
+					color: "text-red-600",
+					bgColor: "bg-red-100",
+				},
+			];
+		}
+
+		return [
+			{
+				title: "Protected Domains",
+				value: domains.length.toString(),
+				icon: Globe,
+				color: "text-blue-600",
+				bgColor: "bg-blue-100",
+			},
+			{
+				title: "Active Users",
+				value: dashboardStats.active_users?.toString() || "0",
+				icon: Users,
+				color: "text-green-600",
+				bgColor: "bg-green-100",
+			},
+			{
+				title: "DMARC Compliance",
+				value: dashboardStats.dmarc_compliance 
+					? `${Math.round(dashboardStats.dmarc_compliance)}%` 
+					: "0%",
+				icon: Shield,
+				color: "text-primary-600",
+				bgColor: "bg-primary-100",
+			},
+			{
+				title: "Threats Blocked",
+				value: "142",
+				icon: BarChart3,
+				color: "text-red-600",
+				bgColor: "bg-red-100",
+			},
+		];
+	};
 
 	const loadRecentActivity = async () => {
 		try {
@@ -98,6 +135,18 @@ const Dashboard = () => {
 		} catch (error) {
 			console.error("Error loading recent activity:", error);
 			setRecentActivity([]);
+		}
+	};
+
+	const loadDashboardStats = async () => {
+		try {
+			console.log("Loading dashboard stats...");
+			const stats = await statsAPI.getDashboardStats();
+			console.log("Dashboard stats loaded:", stats);
+			setDashboardStats(stats);
+		} catch (error) {
+			console.error("Error loading dashboard stats:", error);
+			// Don't show error to user, just use fallback values
 		}
 	};
 
@@ -322,6 +371,7 @@ const Dashboard = () => {
 	useEffect(() => {
 		loadDomains();
 		loadRecentActivity();
+		loadDashboardStats();
 	}, []);
 
 	if (loading) {
@@ -342,25 +392,25 @@ const Dashboard = () => {
 			exit={{ opacity: 0 }}
 			transition={{ duration: 0.3 }}
 			className="min-h-screen bg-gray-50 pt-20">
-			<div className="container-custom py-8">
+			<div className="container-custom py-6">
 				{/* Welcome Header */}
 				<motion.div
 					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.6 }}
-					className="mb-8">
-					<div className="bg-gradient-primary rounded-xl p-6 text-white">
+					className="mb-6">
+					<div className="bg-gradient-primary rounded-xl p-4 text-white max-w-4xl">
 						<div className="flex items-center justify-between">
 							<div>
-								<h1 className="text-2xl md:text-3xl font-bold mb-2">
+								<h1 className="text-xl md:text-2xl font-bold mb-1">
 									Welcome back, {getUserDisplayName()}!
 								</h1>
-								<p className="text-primary-100">
+								<p className="text-primary-100 text-sm">
 									Here is your email security overview for today
 								</p>
 							</div>
 							<div className="hidden md:block">
-								<Shield className="w-16 h-16 text-primary-200" />
+								<Shield className="w-12 h-12 text-primary-200" />
 							</div>
 						</div>
 					</div>
@@ -387,7 +437,7 @@ const Dashboard = () => {
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.6, delay: 0.1 }}
 					className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-					{stats.map((stat) => (
+					{getStats().map((stat) => (
 						<div
 							key={stat.title}
 							className="card hover:shadow-xl transition-shadow duration-300">
@@ -405,7 +455,6 @@ const Dashboard = () => {
 								<p className="text-2xl font-bold text-gray-900 mb-1">
 									{stat.value}
 								</p>
-								<p className="text-xs text-green-600">{stat.change}</p>
 							</div>
 						</div>
 					))}
@@ -484,9 +533,12 @@ const Dashboard = () => {
 											<span className="text-gray-500">
 												Last check: {domain.lastCheck}
 											</span>
-											<button className="text-primary-600 hover:text-primary-700 font-medium">
+											<Link 
+												to={`/dashboard/domains/${domain.id}`}
+												className="text-primary-600 hover:text-primary-700 font-medium"
+											>
 												View Details →
-											</button>
+											</Link>
 										</div>
 									</div>
 								))}
