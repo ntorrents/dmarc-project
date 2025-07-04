@@ -27,6 +27,7 @@ const Dashboard = () => {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
 	const [showAddDomain, setShowAddDomain] = useState(false);
+	const [recentActivity, setRecentActivity] = useState([]);
 
 	// Get user display name
 	const getUserDisplayName = () => {
@@ -77,35 +78,9 @@ const Dashboard = () => {
 		},
 	];
 
-	const recentActivity = [
-		{
-			type: "success",
-			message: "DMARC policy updated to quarantine",
-			domain: "example.com",
-			time: "2 hours ago",
-		},
-		{
-			type: "warning",
-			message: "SPF record alignment issue detected",
-			domain: "mycompany.org",
-			time: "1 day ago",
-		},
-		{
-			type: "info",
-			message: "New user added to account",
-			domain: "john@example.com",
-			time: "2 days ago",
-		},
-		{
-			type: "error",
-			message: "DKIM signature validation failed",
-			domain: "business.net",
-			time: "3 days ago",
-		},
-	];
-
 	useEffect(() => {
 		loadDomains();
+		loadRecentActivity();
 	}, []);
 
 	const loadDomains = async () => {
@@ -137,6 +112,39 @@ const Dashboard = () => {
 		}
 	};
 
+	const loadRecentActivity = async () => {
+		try {
+			console.log("Loading recent activity from API...");
+			
+			const response = await domainsAPI.getRecentActivity();
+			console.log("Recent activity response:", response);
+			
+			// Ensure response is an array
+			const activityData = Array.isArray(response) ? response : (response?.results || []);
+			
+			if (Array.isArray(activityData)) {
+				// Transform API data to match UI expectations
+				const transformedActivity = activityData.map(activity => ({
+					type: mapActivityType(activity.action_type),
+					message: activity.description || activity.message,
+					domain: activity.domain_name || activity.target,
+					time: formatTimeAgo(activity.created_at || activity.timestamp),
+					user: activity.user_name || activity.user,
+				}));
+				
+				setRecentActivity(transformedActivity);
+			} else {
+				console.warn("Activity data is not an array:", activityData);
+				setRecentActivity([]);
+			}
+			
+		} catch (error) {
+			console.error("Error loading recent activity:", error);
+			// Set empty array on error to prevent map function error
+			setRecentActivity([]);
+		}
+	};
+
 	// Helper function to map domain status
 	const mapDomainStatus = (status, complianceLevel) => {
 		if (status === 'active' && complianceLevel === 'high') return 'protected';
@@ -152,6 +160,42 @@ const Dashboard = () => {
 		const checkTime = new Date(lastCheck);
 		const diffInMinutes = Math.floor((now - checkTime) / (1000 * 60));
 		
+		if (diffInMinutes < 60) return `${diffInMinutes} minutes ago`;
+		if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)} hours ago`;
+		return `${Math.floor(diffInMinutes / 1440)} days ago`;
+	};
+
+	// Helper function to map activity type
+	const mapActivityType = (actionType) => {
+		switch (actionType) {
+			case 'domain_added':
+			case 'policy_updated':
+			case 'record_created':
+				return 'success';
+			case 'alignment_issue':
+			case 'policy_warning':
+			case 'spf_warning':
+				return 'warning';
+			case 'validation_failed':
+			case 'dkim_failed':
+			case 'spf_failed':
+				return 'error';
+			case 'user_added':
+			case 'user_updated':
+				return 'info';
+			default:
+				return 'info';
+		}
+	};
+
+	// Helper function to format time ago
+	const formatTimeAgo = (timestamp) => {
+		if (!timestamp) return 'Unknown time';
+		const now = new Date();
+		const time = new Date(timestamp);
+		const diffInMinutes = Math.floor((now - time) / (1000 * 60));
+		
+		if (diffInMinutes < 1) return 'Just now';
 		if (diffInMinutes < 60) return `${diffInMinutes} minutes ago`;
 		if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)} hours ago`;
 		return `${Math.floor(diffInMinutes / 1440)} days ago`;

@@ -36,6 +36,7 @@ export const API_ENDPOINTS = {
 		DNS_RECORDS_BULK_CREATE: `/panel/dns-records/bulk_create/`,
 		AUDIT_LOGS: `/panel/audit-logs/`,
 		AUDIT_LOG_DETAIL: (id) => `/panel/audit-logs/${id}/`,
+		RECENT_ACTIVITY: `/panel/recent-activity/`,
 		SYSTEM_SETTINGS: `/panel/system-settings/`,
 		SYSTEM_SETTING_DETAIL: (id) => `/panel/system-settings/${id}/`,
 	},

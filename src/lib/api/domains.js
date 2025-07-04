@@ -314,4 +314,49 @@ export const domainsAPI = {
 			throw error;
 		}
 	},
+
+	/**
+	 * Get recent activity for dashboard
+	 */
+	getRecentActivity: async () => {
+		if (DEV_CONFIG.USE_MOCK_DOMAINS) {
+			devLog("Using mock recent activity");
+			await simulateDelay();
+			
+			return [
+				{
+					id: 1,
+					action_type: "domain_created",
+					description: "Domain added to monitoring",
+					domain_name: "example.com",
+					user_name: "Admin User",
+					created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
+				},
+				{
+					id: 2,
+					action_type: "policy_updated",
+					description: "DMARC policy updated to quarantine",
+					domain_name: "example.com",
+					user_name: "Admin User",
+					created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
+				},
+				{
+					id: 3,
+					action_type: "dns_check",
+					description: "DNS configuration validated",
+					domain_name: "mycompany.org",
+					user_name: "System",
+					created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days ago
+				},
+			];
+		}
+
+		try {
+			const response = await axiosInstance.get(API_ENDPOINTS.PANEL.RECENT_ACTIVITY);
+			return response.data;
+		} catch (error) {
+			devError("Get recent activity failed:", error);
+			throw error;
+		}
+	},
 };
