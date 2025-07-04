@@ -19,6 +19,7 @@ import { Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { useAuthContext } from "../context/AuthContext";
 import { activityAPI } from "../lib/api/activity";
+import RecentActivity from "@/components/dashboard/RecentActivity";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -79,10 +80,26 @@ const Dashboard = () => {
 		},
 	];
 
-	useEffect(() => {
-		loadDomains();
-		loadRecentActivity();
-	}, []);
+	const loadRecentActivity = async () => {
+		try {
+			const logs = await activityAPI.getRecentActivity();
+
+			const transformed = logs.map((log) => ({
+				id: log.id,
+				user: log.user_email || log.user_username || "Unknown",
+				action: log.action,
+				target: log.object_repr || "-",
+				time: new Date(log.timestamp),
+				ip: log.ip_address || "-",
+			}));
+
+			console.log("Logs transformados:", transformed);
+			setRecentActivity(transformed);
+		} catch (error) {
+			console.error("Error loading recent activity:", error);
+			setRecentActivity([]);
+		}
+	};
 
 	const loadDomains = async () => {
 		try {
@@ -91,19 +108,23 @@ const Dashboard = () => {
 
 			// Get domains from API
 			const data = await domainsAPI.list();
-			
+
 			// Transform API data to match UI expectations
-			const transformedDomains = Array.isArray(data) ? data.map(domain => ({
-				id: domain.id,
-				name: domain.nombre || domain.name,
-				status: mapDomainStatus(domain.status, domain.compliance_level),
-				policy: domain.dmarc_policy || 'none',
-				compliance: domain.compliance_score || 0,
-				lastCheck: formatLastCheck(domain.last_check),
-				emails: domain.email_count || 0,
-				tag: Array.isArray(domain.tags) ? domain.tags[0] : (domain.tag || 'untagged'),
-			})) : [];
-			
+			const transformedDomains = Array.isArray(data)
+				? data.map((domain) => ({
+						id: domain.id,
+						name: domain.nombre || domain.name,
+						status: mapDomainStatus(domain.status, domain.compliance_level),
+						policy: domain.dmarc_policy || "none",
+						compliance: domain.compliance_score || 0,
+						lastCheck: formatLastCheck(domain.last_check),
+						emails: domain.email_count || 0,
+						tag: Array.isArray(domain.tags)
+							? domain.tags[0]
+							: domain.tag || "untagged",
+				  }))
+				: [];
+
 			setDomains(transformedDomains);
 		} catch (err) {
 			console.error("Error loading domains:", err);
@@ -113,92 +134,24 @@ const Dashboard = () => {
 		}
 	};
 
-	const loadRecentActivity = async () => {
-		try {
-			console.log("Loading recent activity from API...");
-			
-			const response = await domainsAPI.getRecentActivity();
-			console.log("Recent activity response:", response);
-			
-			// Ensure response is an array
-			const activityData = Array.isArray(response) ? response : (response?.results || []);
-			
-			if (Array.isArray(activityData)) {
-				// Transform API data to match UI expectations
-				const transformedActivity = activityData.map(activity => ({
-					type: mapActivityType(activity.action_type),
-					message: activity.description || activity.message,
-					domain: activity.domain_name || activity.target,
-					time: formatTimeAgo(activity.created_at || activity.timestamp),
-					user: activity.user_name || activity.user,
-				}));
-				
-				setRecentActivity(transformedActivity);
-			} else {
-				console.warn("Activity data is not an array:", activityData);
-				setRecentActivity([]);
-			}
-			
-		} catch (error) {
-			console.error("Error loading recent activity:", error);
-			// Set empty array on error to prevent map function error
-			setRecentActivity([]);
-		}
-	};
-
 	// Helper function to map domain status
 	const mapDomainStatus = (status, complianceLevel) => {
-		if (status === 'active' && complianceLevel === 'high') return 'protected';
-		if (status === 'active' && complianceLevel === 'medium') return 'warning';
-		if (status === 'active' && complianceLevel === 'low') return 'error';
-		return status || 'error';
+		if (status === "active" && complianceLevel === "high") return "protected";
+		if (status === "active" && complianceLevel === "medium") return "warning";
+		if (status === "active" && complianceLevel === "low") return "error";
+		return status || "error";
 	};
 
 	// Helper function to format last check time
 	const formatLastCheck = (lastCheck) => {
-		if (!lastCheck) return 'Never';
+		if (!lastCheck) return "Never";
 		const now = new Date();
 		const checkTime = new Date(lastCheck);
 		const diffInMinutes = Math.floor((now - checkTime) / (1000 * 60));
-		
-		if (diffInMinutes < 60) return `${diffInMinutes} minutes ago`;
-		if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)} hours ago`;
-		return `${Math.floor(diffInMinutes / 1440)} days ago`;
-	};
 
-	// Helper function to map activity type
-	const mapActivityType = (actionType) => {
-		switch (actionType) {
-			case 'domain_added':
-			case 'policy_updated':
-			case 'record_created':
-				return 'success';
-			case 'alignment_issue':
-			case 'policy_warning':
-			case 'spf_warning':
-				return 'warning';
-			case 'validation_failed':
-			case 'dkim_failed':
-			case 'spf_failed':
-				return 'error';
-			case 'user_added':
-			case 'user_updated':
-				return 'info';
-			default:
-				return 'info';
-		}
-	};
-
-	// Helper function to format time ago
-	const formatTimeAgo = (timestamp) => {
-		if (!timestamp) return 'Unknown time';
-		const now = new Date();
-		const time = new Date(timestamp);
-		const diffInMinutes = Math.floor((now - time) / (1000 * 60));
-		
-		if (diffInMinutes < 1) return 'Just now';
 		if (diffInMinutes < 60) return `${diffInMinutes} minutes ago`;
-		if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)} hours ago`;
+		if (diffInMinutes < 1440)
+			return `${Math.floor(diffInMinutes / 60)} hours ago`;
 		return `${Math.floor(diffInMinutes / 1440)} days ago`;
 	};
 
@@ -210,22 +163,22 @@ const Dashboard = () => {
 				description: domainData.description,
 				tags: domainData.tag ? [domainData.tag] : [],
 			});
-			
+
 			// Transform and add to local state
 			const transformedDomain = {
 				id: createdDomain.id,
 				name: createdDomain.nombre || createdDomain.name,
-				status: 'warning',
-				policy: 'none',
+				status: "warning",
+				policy: "none",
 				compliance: 0,
-				lastCheck: 'Just added',
+				lastCheck: "Just added",
 				emails: 0,
-				tag: domainData.tag || 'new',
+				tag: domainData.tag || "new",
 			};
-			
+
 			setDomains((prev) => [...prev, transformedDomain]);
 			setShowAddDomain(false);
-			
+
 			// Log the domain creation activity
 			try {
 				await activityAPI.logDomainCreated(
@@ -365,6 +318,11 @@ const Dashboard = () => {
 			},
 		},
 	};
+
+	useEffect(() => {
+		loadDomains();
+		loadRecentActivity();
+	}, []);
 
 	if (loading) {
 		return (
@@ -640,26 +598,7 @@ const Dashboard = () => {
 							<h2 className="text-xl font-bold text-gray-900 mb-4">
 								Recent Activity
 							</h2>
-							<div className="space-y-3">
-								{recentActivity.map((activity, index) => (
-									<div
-										key={index}
-										className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
-										{getActivityIcon(activity.type)}
-										<div className="flex-1 min-w-0">
-											<p className="text-sm font-medium text-gray-900 truncate">
-												{activity.message}
-											</p>
-											<p className="text-xs text-gray-500">
-												{activity.domain} • {activity.time}
-											</p>
-										</div>
-									</div>
-								))}
-							</div>
-							<button className="w-full mt-4 text-sm text-primary-600 hover:text-primary-700 font-medium">
-								View All Activity →
-							</button>
+							<RecentActivity logs={recentActivity} />
 						</div>
 					</motion.div>
 				</div>
