@@ -17,6 +17,8 @@ import { getErrorMessage } from "../lib/helpers";
 import AddDomainModal from "../components/modals/AddDomainModal";
 import { Link } from "react-router-dom";
 import { useNotification } from "../context/NotificationContext";
+import { activityAPI } from "../lib/api/activity";
+import { useAuthContext } from "../context/AuthContext";
 
 const MyDomains = () => {
 	const [domains, setDomains] = useState([]);
@@ -25,6 +27,7 @@ const MyDomains = () => {
 	const [error, setError] = useState(null);
 	const [showAddDomain, setShowAddDomain] = useState(false);
 	const { success, error: showError } = useNotification();
+	const { user } = useAuthContext();
 
 	// Filter states
 	const [filters, setFilters] = useState({
@@ -217,6 +220,20 @@ const MyDomains = () => {
 			setDomains((prev) => [...prev, transformedDomain]);
 			setShowAddDomain(false);
 			success("Domain added successfully!");
+			
+			// Log the domain creation activity
+			try {
+				const userName = user?.first_name && user?.last_name 
+					? `${user.first_name} ${user.last_name}` 
+					: user?.username || user?.name || "User";
+				
+				await activityAPI.logDomainCreated(
+					createdDomain.nombre || createdDomain.name,
+					userName
+				);
+			} catch (error) {
+				console.error("Failed to log domain creation activity:", error);
+			}
 		} catch (err) {
 			console.error("Error adding domain:", err);
 			const errorMessage = getErrorMessage(err);

@@ -18,6 +18,7 @@ import AddDomainModal from "../components/modals/AddDomainModal";
 import { Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { useAuthContext } from "../context/AuthContext";
+import { activityAPI } from "../lib/api/activity";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -224,6 +225,18 @@ const Dashboard = () => {
 			
 			setDomains((prev) => [...prev, transformedDomain]);
 			setShowAddDomain(false);
+			
+			// Log the domain creation activity
+			try {
+				await activityAPI.logDomainCreated(
+					createdDomain.nombre || createdDomain.name,
+					getUserDisplayName()
+				);
+				// Reload recent activity to show the new entry
+				loadRecentActivity();
+			} catch (error) {
+				console.error("Failed to log domain creation activity:", error);
+			}
 		} catch (err) {
 			console.error("Error adding domain:", err);
 			throw err;

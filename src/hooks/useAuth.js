@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { authAPI } from "../lib/api/auth";
 import { IS_DEV } from "../lib/constants";
+import { activityAPI } from "../lib/api/activity";
 
 export const useAuth = () => {
 	const [user, setUser] = useState(null);
@@ -47,6 +48,17 @@ export const useAuth = () => {
 			if (authResult.authenticated) {
 				console.log("User logged in:", authResult.user); // Debug log
 				setUser(authResult.user);
+				
+				// Log successful login activity
+				try {
+					const userName = authResult.user?.first_name && authResult.user?.last_name 
+						? `${authResult.user.first_name} ${authResult.user.last_name}` 
+						: authResult.user?.username || authResult.user?.name || "User";
+					
+					await activityAPI.logUserLogin(userName, authResult.user?.email);
+				} catch (error) {
+					console.error("Failed to log login activity:", error);
+				}
 			}
 
 			return result;
