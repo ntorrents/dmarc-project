@@ -522,6 +522,7 @@ const Dashboard = () => {
 										<ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
 									</div>
 									
+									<button
 										onClick={() => setShowAddDomain(true)}
 										className="btn-primary">
 										<Plus className="w-4 h-4 mr-2" />
