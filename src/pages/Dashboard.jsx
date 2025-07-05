@@ -460,14 +460,15 @@ const Dashboard = () => {
 					))}
 				</motion.div>
 
-				<div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-					{/* Domains Overview */}
+				{/* First Row: Domain Protection Status + DMARC Policy Distribution */}
+				<div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+					{/* Domain Protection Status - 2/3 width */}
 					<motion.div
 						initial={{ opacity: 0, y: 20 }}
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.6, delay: 0.2 }}
 						className="lg:col-span-2">
-						<div className="card">
+						<div className="card h-full">
 							<div className="flex items-center justify-between mb-6">
 								<h2 className="text-xl font-bold text-gray-900">
 									Domain Protection Status
@@ -545,14 +546,13 @@ const Dashboard = () => {
 						</div>
 					</motion.div>
 
-					{/* Sidebar */}
+					{/* DMARC Policy Distribution Chart - 1/3 width */}
 					<motion.div
 						initial={{ opacity: 0, y: 20 }}
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.6, delay: 0.3 }}
-						className="space-y-6">
-						{/* DMARC Policy Distribution Chart */}
-						<div className="card">
+						className="lg:col-span-1">
+						<div className="card h-full">
 							<h2 className="text-xl font-bold text-gray-900 mb-4">
 								DMARC Policy Distribution
 							</h2>
@@ -595,9 +595,18 @@ const Dashboard = () => {
 								</div>
 							</div>
 						</div>
+					</motion.div>
+				</div>
 
-						{/* Quick Actions */}
-						<div className="card">
+				{/* Second Row: Quick Actions + Recent Activity + Need Help */}
+				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+					{/* Quick Actions */}
+					<motion.div
+						initial={{ opacity: 0, y: 20 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ duration: 0.6, delay: 0.4 }}
+						className="order-1">
+						<div className="card h-full">
 							<h2 className="text-xl font-bold text-gray-900 mb-4">
 								Quick Actions
 							</h2>
@@ -617,7 +626,9 @@ const Dashboard = () => {
 										</div>
 									</div>
 								</button>
-								<button className="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors group">
+								<Link
+									to="/dashboard/reports"
+									className="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors group block">
 									<div className="flex items-center">
 										<BarChart3 className="w-5 h-5 text-primary-600 mr-3 group-hover:scale-110 transition-transform" />
 										<div>
@@ -627,8 +638,10 @@ const Dashboard = () => {
 											</p>
 										</div>
 									</div>
-								</button>
-								<button className="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors group">
+								</Link>
+								<Link
+									to="/dashboard/settings"
+									className="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors group block">
 									<div className="flex items-center">
 										<Settings className="w-5 h-5 text-primary-600 mr-3 group-hover:scale-110 transition-transform" />
 										<div>
@@ -640,16 +653,64 @@ const Dashboard = () => {
 											</p>
 										</div>
 									</div>
-								</button>
+								</Link>
 							</div>
 						</div>
+					</motion.div>
 
-						{/* Recent Activity */}
-						<div className="card">
+					{/* Recent Activity */}
+					<motion.div
+						initial={{ opacity: 0, y: 20 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ duration: 0.6, delay: 0.5 }}
+						className="order-2">
+						<div className="card h-full">
 							<h2 className="text-xl font-bold text-gray-900 mb-4">
 								Recent Activity
 							</h2>
 							<RecentActivity logs={recentActivity} />
+						</div>
+					</motion.div>
+
+					{/* Need Help Card */}
+					<motion.div
+						initial={{ opacity: 0, y: 20 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ duration: 0.6, delay: 0.6 }}
+						className="order-3">
+						<div className="card h-full flex flex-col">
+							<div className="flex items-center mb-4">
+								<Mail className="w-6 h-6 text-primary-600 mr-3" />
+								<h2 className="text-xl font-bold text-gray-900">Need Help?</h2>
+							</div>
+							
+							<div className="flex-grow">
+								<p className="text-gray-600 mb-6 leading-relaxed">
+									If you need support or have any questions, feel free to reach out to our team.
+								</p>
+								
+								<div className="mb-6">
+									<div className="flex items-center text-gray-700 mb-2">
+										<Mail className="w-4 h-4 text-primary-600 mr-2" />
+										<span className="font-medium">Support Email:</span>
+									</div>
+									<a 
+										href="mailto:support@safedmarc.com"
+										className="text-primary-600 hover:text-primary-700 font-medium"
+									>
+										support@safedmarc.com
+									</a>
+								</div>
+							</div>
+							
+							<div className="mt-auto">
+								<Link
+									to="/contact"
+									className="btn-primary w-full text-center"
+								>
+									Contact Support
+								</Link>
+							</div>
 						</div>
 					</motion.div>
 				</div>
