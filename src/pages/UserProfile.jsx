@@ -9,6 +9,10 @@ import {
 	Eye,
 	EyeOff,
 	Shield,
+	Users,
+	MapPin,
+	Calendar,
+	Phone,
 } from "lucide-react";
 import { authAPI } from "../lib/api/auth";
 import { companiesAPI } from "../lib/api/companies";
@@ -21,17 +25,21 @@ const UserProfile = () => {
 	const { success, error: showError } = useNotification();
 
 	const [profile, setProfile] = useState({
-		name: "",
+		firstName: "",
+		lastName: "",
 		email: "",
 		currentPassword: "",
 		newPassword: "",
 		confirmPassword: "",
 	});
-	const [organization, setOrganization] = useState({
+	const [enterpriseInfo, setEnterpriseInfo] = useState({
 		name: "",
 		email: "",
 		phone: "",
 		address: "",
+		activeUsers: 0,
+		totalDomains: 0,
+		createdAt: "",
 	});
 	const [loading, setLoading] = useState(true);
 	const [saving, setSaving] = useState(false);
@@ -41,7 +49,6 @@ const UserProfile = () => {
 		new: false,
 		confirm: false,
 	});
-	const [isAdmin, setIsAdmin] = useState(false);
 
 	useEffect(() => {
 		loadProfile();
@@ -52,62 +59,46 @@ const UserProfile = () => {
 			setLoading(true);
 			setError(null);
 
-			const isDev = import.meta.env.MODE === "development";
-
-			if (isDev) {
-				// Mock data for development
-				setTimeout(() => {
-					setProfile({
-						name: user?.name || "Dev User",
-						email: user?.email || "dev@example.com",
-						currentPassword: "",
-						newPassword: "",
-						confirmPassword: "",
-					});
-
-					setOrganization({
-						name: "Example Corp",
-						email: "contact@example.com",
-						phone: "+1 (555) 123-4567",
-						address: "123 Business St, City, State 12345",
-					});
-
-					setIsAdmin(user?.role === "admin");
-					setLoading(false);
-				}, 1000);
-				return;
-			}
-
-			// Production API calls
-			// Use user data from context if available, otherwise fetch from API
+			// Get user data from context or API
 			let profileData = user;
 			if (!profileData) {
 				profileData = await authAPI.getProfile();
 			}
 
-			// Try to get organization data (only admins can access this)
-			const orgData = await companiesAPI.get().catch(() => null);
-
+			// Set profile data using real user information
 			setProfile({
-				name:
-					profileData.first_name && profileData.last_name
-						? `${profileData.first_name} ${profileData.last_name}`
-						: profileData.username || profileData.name || "",
-				email: profileData.email,
+				firstName: profileData.first_name || "",
+				lastName: profileData.last_name || "",
+				email: profileData.email || "",
 				currentPassword: "",
 				newPassword: "",
 				confirmPassword: "",
 			});
 
-			if (orgData) {
-				setOrganization(orgData);
-				setIsAdmin(true);
-			} else {
-				// Check if user has admin role
-				setIsAdmin(
-					profileData.role === "client_admin" ||
-						profileData.role === "super_admin"
-				);
+			// Try to get enterprise/company data
+			try {
+				const companyData = await companiesAPI.get();
+				setEnterpriseInfo({
+					name: companyData.name || "N/A",
+					email: companyData.email || "N/A",
+					phone: companyData.phone || "N/A",
+					address: companyData.address || "N/A",
+					activeUsers: companyData.active_users || 0,
+					totalDomains: companyData.total_domains || 0,
+					createdAt: companyData.created_at || "",
+				});
+			} catch (companyError) {
+				console.log("Could not load company data:", companyError);
+				// Set default values if company data is not available
+				setEnterpriseInfo({
+					name: "Not Available",
+					email: "Not Available",
+					phone: "Not Available",
+					address: "Not Available",
+					activeUsers: 0,
+					totalDomains: 0,
+					createdAt: "",
+				});
 			}
 		} catch (err) {
 			console.error("Error loading profile:", err);
@@ -126,23 +117,14 @@ const UserProfile = () => {
 		if (error) setError(null);
 	};
 
-	const handleOrganizationChange = (field, value) => {
-		setOrganization((prev) => ({
-			...prev,
-			[field]: sanitizeInput(value),
-		}));
-
-		if (error) setError(null);
-	};
-
 	const handleSaveProfile = async () => {
 		try {
 			setError(null);
 			setSaving(true);
 
 			// Validation
-			if (!profile.name.trim() || !profile.email.trim()) {
-				setError("Name and email are required");
+			if (!profile.firstName.trim() || !profile.lastName.trim() || !profile.email.trim()) {
+				setError("First name, last name, and email are required");
 				return;
 			}
 
@@ -174,42 +156,23 @@ const UserProfile = () => {
 				}
 			}
 
-			const isDev = import.meta.env.MODE === "development";
-
-			if (isDev) {
-				// Mock save
-				await updateProfile({
-					name: profile.name,
-					email: profile.email,
-				});
-				success("Profile updated successfully!");
-
-				// Clear password fields
-				setProfile((prev) => ({
-					...prev,
-					currentPassword: "",
-					newPassword: "",
-					confirmPassword: "",
-				}));
-				return;
-			}
-
-			// Production API call
+			// Prepare update data
 			const updateData = {
-				first_name: profile.name.split(" ")[0] || profile.name,
-				last_name: profile.name.split(" ").slice(1).join(" ") || "",
+				first_name: profile.firstName,
+				last_name: profile.lastName,
 				email: profile.email,
 			};
 
+			// Add password change if requested
 			if (profile.newPassword) {
 				updateData.current_password = profile.currentPassword;
 				updateData.password = profile.newPassword;
 			}
 
-			await authAPI.updateProfile(updateData);
+			// Call API to update profile
+			const updatedUser = await authAPI.updateProfile(updateData);
 
 			// Update the context with new user data
-			const updatedUser = { ...user, ...updateData };
 			await updateProfile(updatedUser);
 
 			success("Profile updated successfully!");
@@ -231,48 +194,27 @@ const UserProfile = () => {
 		}
 	};
 
-	const handleSaveOrganization = async () => {
-		try {
-			setError(null);
-			setSaving(true);
-
-			// Validation
-			if (!organization.name.trim() || !organization.email.trim()) {
-				setError("Organization name and email are required");
-				return;
-			}
-
-			if (!validateEmail(organization.email)) {
-				setError("Please enter a valid organization email address");
-				return;
-			}
-
-			const isDev = import.meta.env.MODE === "development";
-
-			if (isDev) {
-				// Mock save
-				success("Organization settings updated successfully!");
-				return;
-			}
-
-			// Production API call
-			await companiesAPI.update(organization);
-			success("Organization settings updated successfully!");
-		} catch (err) {
-			console.error("Error saving organization:", err);
-			const errorMessage = getErrorMessage(err);
-			setError(errorMessage);
-			showError("Failed to update organization settings", errorMessage);
-		} finally {
-			setSaving(false);
-		}
-	};
-
 	const togglePasswordVisibility = (field) => {
 		setShowPasswords((prev) => ({
 			...prev,
 			[field]: !prev[field],
 		}));
+	};
+
+	const formatDate = (dateString) => {
+		if (!dateString) return "N/A";
+		return new Date(dateString).toLocaleDateString("en-US", {
+			year: "numeric",
+			month: "long",
+			day: "numeric",
+		});
+	};
+
+	const getFullName = () => {
+		if (profile.firstName && profile.lastName) {
+			return `${profile.firstName} ${profile.lastName}`;
+		}
+		return user?.username || user?.name || "User";
 	};
 
 	if (loading) {
@@ -302,7 +244,7 @@ const UserProfile = () => {
 					className="mb-8">
 					<h1 className="text-3xl font-bold text-gray-900">User Profile</h1>
 					<p className="text-gray-600 mt-1">
-						Manage your account settings and preferences
+						Welcome, {getFullName()}! Manage your account settings and view enterprise information.
 					</p>
 				</motion.div>
 
@@ -334,20 +276,37 @@ const UserProfile = () => {
 						</h2>
 
 						<div className="space-y-6">
-							{/* Name */}
+							{/* First Name */}
 							<div>
 								<label
-									htmlFor="name"
+									htmlFor="firstName"
 									className="block text-sm font-medium text-gray-700 mb-2">
-									Full Name
+									First Name
 								</label>
 								<input
 									type="text"
-									id="name"
-									value={profile.name}
-									onChange={(e) => handleProfileChange("name", e.target.value)}
+									id="firstName"
+									value={profile.firstName}
+									onChange={(e) => handleProfileChange("firstName", e.target.value)}
 									className="input-field"
-									placeholder="Enter your full name"
+									placeholder="Enter your first name"
+								/>
+							</div>
+
+							{/* Last Name */}
+							<div>
+								<label
+									htmlFor="lastName"
+									className="block text-sm font-medium text-gray-700 mb-2">
+									Last Name
+								</label>
+								<input
+									type="text"
+									id="lastName"
+									value={profile.lastName}
+									onChange={(e) => handleProfileChange("lastName", e.target.value)}
+									className="input-field"
+									placeholder="Enter your last name"
 								/>
 							</div>
 
@@ -509,126 +468,124 @@ const UserProfile = () => {
 						</div>
 					</motion.div>
 
-					{/* Organization Settings (Admin Only) */}
-					{isAdmin && (
-						<motion.div
-							initial={{ opacity: 0, y: 20 }}
-							animate={{ opacity: 1, y: 0 }}
-							transition={{ duration: 0.6, delay: 0.2 }}
-							className="card">
-							<h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
-								<Building className="w-6 h-6 mr-2" />
-								Organization Settings
-								<span className="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-									<Shield className="w-3 h-3 mr-1" />
-									Admin Only
-								</span>
-							</h2>
+					{/* Enterprise Information (Read-Only) */}
+					<motion.div
+						initial={{ opacity: 0, y: 20 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ duration: 0.6, delay: 0.2 }}
+						className="card">
+						<h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
+							<Building className="w-6 h-6 mr-2" />
+							Enterprise Information
+							<span className="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+								<Shield className="w-3 h-3 mr-1" />
+								Read Only
+							</span>
+						</h2>
 
-							<div className="space-y-6">
-								{/* Organization Name */}
-								<div>
-									<label
-										htmlFor="orgName"
-										className="block text-sm font-medium text-gray-700 mb-2">
-										Organization Name
-									</label>
-									<input
-										type="text"
-										id="orgName"
-										value={organization.name}
-										onChange={(e) =>
-											handleOrganizationChange("name", e.target.value)
-										}
-										className="input-field"
-										placeholder="Enter organization name"
-									/>
+						<div className="space-y-6">
+							{/* Enterprise Name */}
+							<div>
+								<label className="block text-sm font-medium text-gray-700 mb-2">
+									Enterprise Name
+								</label>
+								<div className="input-field bg-gray-50 text-gray-600 cursor-not-allowed">
+									{enterpriseInfo.name}
 								</div>
+							</div>
 
-								{/* Organization Email */}
-								<div>
-									<label
-										htmlFor="orgEmail"
-										className="block text-sm font-medium text-gray-700 mb-2">
-										Organization Email
-									</label>
-									<div className="relative">
-										<div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-											<Mail className="h-5 w-5 text-gray-400" />
+							{/* Enterprise Email */}
+							<div>
+								<label className="block text-sm font-medium text-gray-700 mb-2">
+									Enterprise Email
+								</label>
+								<div className="relative">
+									<div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+										<Mail className="h-5 w-5 text-gray-400" />
+									</div>
+									<div className="input-field pl-10 bg-gray-50 text-gray-600 cursor-not-allowed">
+										{enterpriseInfo.email}
+									</div>
+								</div>
+							</div>
+
+							{/* Phone */}
+							<div>
+								<label className="block text-sm font-medium text-gray-700 mb-2">
+									Phone Number
+								</label>
+								<div className="relative">
+									<div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+										<Phone className="h-5 w-5 text-gray-400" />
+									</div>
+									<div className="input-field pl-10 bg-gray-50 text-gray-600 cursor-not-allowed">
+										{enterpriseInfo.phone}
+									</div>
+								</div>
+							</div>
+
+							{/* Address */}
+							<div>
+								<label className="block text-sm font-medium text-gray-700 mb-2">
+									Address
+								</label>
+								<div className="relative">
+									<div className="absolute top-3 left-3 pointer-events-none">
+										<MapPin className="h-5 w-5 text-gray-400" />
+									</div>
+									<div className="input-field pl-10 bg-gray-50 text-gray-600 cursor-not-allowed min-h-[80px] py-3">
+										{enterpriseInfo.address}
+									</div>
+								</div>
+							</div>
+
+							{/* Enterprise Statistics */}
+							<div className="pt-6 border-t border-gray-200">
+								<h3 className="text-lg font-semibold text-gray-900 mb-4">
+									Enterprise Statistics
+								</h3>
+								
+								<div className="grid grid-cols-2 gap-4">
+									<div className="bg-gray-50 rounded-lg p-4">
+										<div className="flex items-center mb-2">
+											<Users className="w-5 h-5 text-blue-600 mr-2" />
+											<span className="text-sm font-medium text-gray-700">Active Users</span>
 										</div>
-										<input
-											type="email"
-											id="orgEmail"
-											value={organization.email}
-											onChange={(e) =>
-												handleOrganizationChange("email", e.target.value)
-											}
-											className="input-field pl-10"
-											placeholder="Enter organization email"
-										/>
+										<div className="text-2xl font-bold text-gray-900">
+											{enterpriseInfo.activeUsers}
+										</div>
+									</div>
+									
+									<div className="bg-gray-50 rounded-lg p-4">
+										<div className="flex items-center mb-2">
+											<Shield className="w-5 h-5 text-green-600 mr-2" />
+											<span className="text-sm font-medium text-gray-700">Total Domains</span>
+										</div>
+										<div className="text-2xl font-bold text-gray-900">
+											{enterpriseInfo.totalDomains}
+										</div>
 									</div>
 								</div>
 
-								{/* Phone */}
-								<div>
-									<label
-										htmlFor="orgPhone"
-										className="block text-sm font-medium text-gray-700 mb-2">
-										Phone Number
-									</label>
-									<input
-										type="tel"
-										id="orgPhone"
-										value={organization.phone}
-										onChange={(e) =>
-											handleOrganizationChange("phone", e.target.value)
-										}
-										className="input-field"
-										placeholder="Enter phone number"
-									/>
-								</div>
-
-								{/* Address */}
-								<div>
-									<label
-										htmlFor="orgAddress"
-										className="block text-sm font-medium text-gray-700 mb-2">
-										Address
-									</label>
-									<textarea
-										id="orgAddress"
-										value={organization.address}
-										onChange={(e) =>
-											handleOrganizationChange("address", e.target.value)
-										}
-										rows={3}
-										className="input-field resize-none"
-										placeholder="Enter organization address"
-									/>
-								</div>
-
-								{/* Save Button */}
-								<div className="flex justify-end pt-6 border-t border-gray-200">
-									<button
-										onClick={handleSaveOrganization}
-										disabled={saving}
-										className="btn-primary">
-										{saving ? (
-											<div className="flex items-center">
-												<div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-												Saving...
-											</div>
-										) : (
-											<>
-												<Save className="w-4 h-4 mr-2" />
-												Save Organization
-											</>
-										)}
-									</button>
-								</div>
+								{enterpriseInfo.createdAt && (
+									<div className="mt-4 p-3 bg-gray-50 rounded-lg">
+										<div className="flex items-center text-sm text-gray-600">
+											<Calendar className="w-4 h-4 mr-2" />
+											<span>Enterprise created: {formatDate(enterpriseInfo.createdAt)}</span>
+										</div>
+									</div>
+								)}
 							</div>
-						</motion.div>
-					)}
+
+							{/* Note */}
+							<div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+								<p className="text-sm text-blue-800">
+									<strong>Note:</strong> Enterprise information is managed by your system administrator. 
+									Contact support if you need to update these details.
+								</p>
+							</div>
+						</div>
+					</motion.div>
 				</div>
 			</div>
 		</motion.div>
