@@ -129,15 +129,17 @@ const Dashboard = () => {
 	// Get filtered domains for display
 	const getFilteredDomains = () => {
 		let filteredDomains = [...domains];
-		
+
 		if (domainFilter === "recent") {
 			// Sort by creation date (most recent first)
-			filteredDomains.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+			filteredDomains.sort(
+				(a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+			);
 		} else if (domainFilter === "active") {
 			// Sort by email count (highest first)
 			filteredDomains.sort((a, b) => b.emails - a.emails);
 		}
-		
+
 		// Return only first 3 domains
 		return filteredDomains.slice(0, 3);
 	};
@@ -373,8 +375,8 @@ const Dashboard = () => {
 				top: 10,
 				bottom: 10,
 				left: 10,
-				right: 10
-			}
+				right: 10,
+			},
 		},
 		plugins: {
 			legend: {
@@ -383,8 +385,8 @@ const Dashboard = () => {
 					padding: 20,
 					usePointStyle: true,
 					font: {
-					boxWidth: 12,
-					boxHeight: 12,
+						boxWidth: 12,
+						boxHeight: 12,
 						size: 12,
 					},
 				},
@@ -435,7 +437,7 @@ const Dashboard = () => {
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.6 }}
 					className="mb-8">
-					<div className="bg-gradient-primary rounded-xl p-6 text-white max-w-4xl">
+					<div className="bg-gradient-primary rounded-xl p-6 text-white max-w-1xl">
 						<div className="flex items-center justify-between">
 							<div>
 								<h1 className="text-xl md:text-2xl font-bold mb-1">
@@ -514,14 +516,13 @@ const Dashboard = () => {
 										<select
 											value={domainFilter}
 											onChange={(e) => setDomainFilter(e.target.value)}
-											className="appearance-none bg-white border border-gray-300 rounded-lg px-3 py-2 pr-8 text-sm font-medium text-gray-700 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-										>
+											className="appearance-none bg-white border border-gray-300 rounded-lg px-3 py-2 pr-8 text-sm font-medium text-gray-700 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
 											<option value="recent">Most Recent</option>
 											<option value="active">Most Active</option>
 										</select>
 										<ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
 									</div>
-									
+
 									<button
 										onClick={() => setShowAddDomain(true)}
 										className="btn-primary">
@@ -592,30 +593,36 @@ const Dashboard = () => {
 										</div>
 									</div>
 								))}
-								
+
 								{/* Show message if fewer than 3 domains */}
 								{getFilteredDomains().length === 0 && (
 									<div className="text-center py-12 border-2 border-dashed border-gray-300 rounded-lg">
 										<Globe className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-										<h3 className="text-lg font-semibold text-gray-900 mb-2">No domains yet</h3>
-										<p className="text-gray-600 mb-4">Add your first domain to start monitoring email security.</p>
-									</div>
-								)}
-								
-								{getFilteredDomains().length > 0 && getFilteredDomains().length < 3 && (
-									<div className="text-center py-8 border border-gray-200 rounded-lg bg-gray-50">
-										<p className="text-gray-600">
-											Showing {getFilteredDomains().length} of {domains.length} domains
+										<h3 className="text-lg font-semibold text-gray-900 mb-2">
+											No domains yet
+										</h3>
+										<p className="text-gray-600 mb-4">
+											Add your first domain to start monitoring email security.
 										</p>
-										{domains.length > 3 && (
-											<Link
-												to="/dashboard/domains"
-												className="text-primary-600 hover:text-primary-700 font-medium text-sm mt-2 inline-block">
-												View all domains →
-											</Link>
-										)}
 									</div>
 								)}
+
+								{getFilteredDomains().length > 0 &&
+									getFilteredDomains().length < 3 && (
+										<div className="text-center py-8 border border-gray-200 rounded-lg bg-gray-50">
+											<p className="text-gray-600">
+												Showing {getFilteredDomains().length} of{" "}
+												{domains.length} domains
+											</p>
+											{domains.length > 3 && (
+												<Link
+													to="/dashboard/domains"
+													className="text-primary-600 hover:text-primary-700 font-medium text-sm mt-2 inline-block">
+													View all domains →
+												</Link>
+											)}
+										</div>
+									)}
 							</div>
 						</div>
 					</motion.div>
@@ -631,8 +638,7 @@ const Dashboard = () => {
 								DMARC Policy Distribution
 							</h2>
 							<div className="flex-grow flex items-center justify-center">
-								<div className="w-full h-64">
-								</div>
+								<div className="w-full h-64"></div>
 								<Doughnut data={doughnutData} options={doughnutOptions} />
 							</div>
 							<div className="mt-2 text-sm text-gray-600">
@@ -799,15 +805,18 @@ const Dashboard = () => {
 								</div>
 								<h2 className="text-xl font-bold text-gray-900">Need Help?</h2>
 							</div>
-							
+
 							<div className="flex-grow">
 								<p className="text-gray-600 mb-6 leading-relaxed">
-									Our support team is here to help you with any questions about email security, DMARC configuration, or account management.
+									Our support team is here to help you with any questions about
+									email security, DMARC configuration, or account management.
 								</p>
-								
+
 								{/* Help Topics */}
 								<div className="mb-6">
-									<h4 className="font-medium text-gray-900 mb-3">Popular Help Topics:</h4>
+									<h4 className="font-medium text-gray-900 mb-3">
+										Popular Help Topics:
+									</h4>
 									<ul className="space-y-2 text-sm text-gray-600">
 										<li className="flex items-center">
 											<BookOpen className="w-3 h-3 mr-2 text-primary-500" />
@@ -823,26 +832,22 @@ const Dashboard = () => {
 										</li>
 									</ul>
 								</div>
-								
+
 								<div className="mb-6">
 									<div className="flex items-center text-gray-700 mb-2">
 										<Mail className="w-4 h-4 text-primary-600 mr-2" />
 										<span className="font-medium">Support Email:</span>
 									</div>
-									<a 
+									<a
 										href="mailto:support@safedmarc.com"
-										className="text-primary-600 hover:text-primary-700 font-medium"
-									>
+										className="text-primary-600 hover:text-primary-700 font-medium">
 										support@safedmarc.com
 									</a>
 								</div>
 							</div>
-							
+
 							<div className="mt-auto">
-								<Link
-									to="/contact"
-									className="btn-primary w-full text-center"
-								>
+								<Link to="/contact" className="btn-primary w-full text-center">
 									Contact Support
 								</Link>
 							</div>

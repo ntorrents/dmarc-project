@@ -48,13 +48,14 @@ export const useAuth = () => {
 			if (authResult.authenticated) {
 				console.log("User logged in:", authResult.user); // Debug log
 				setUser(authResult.user);
-				
+
 				// Log successful login activity
 				try {
-					const userName = authResult.user?.first_name && authResult.user?.last_name 
-						? `${authResult.user.first_name} ${authResult.user.last_name}` 
-						: authResult.user?.username || authResult.user?.name || "User";
-					
+					const userName =
+						authResult.user?.first_name && authResult.user?.last_name
+							? `${authResult.user.first_name} ${authResult.user.last_name}`
+							: authResult.user?.username || authResult.user?.name || "User";
+
 					await activityAPI.logUserLogin(userName, authResult.user?.email);
 				} catch (error) {
 					console.error("Failed to log login activity:", error);
@@ -149,10 +150,12 @@ export const useAuth = () => {
 
 	// Computed properties
 	const isAuthenticated = !!user;
-	const isAdmin = user?.role === "client_admin" || user?.role === "super_admin";
-	const isSuperAdmin = user?.role === "super_admin";
+	const isAdmin =
+		user?.computed_role === "client_admin" ||
+		user?.computed_role === "super_admin";
+	const isSuperAdmin = user?.computed_role === "super_admin";
 	const hasPermission = (permission) =>
-		Array.isArray(user?.permissions) && user.permissions.includes(permission);
+		Boolean(user?.permissions?.[permission]);
 
 	return {
 		user,
