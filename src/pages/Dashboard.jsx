@@ -12,6 +12,13 @@ import {
 	XCircle,
 	TrendingUp,
 	Mail,
+	ChevronDown,
+	Activity,
+	Search,
+	ExternalLink,
+	HelpCircle,
+	BookOpen,
+	MessageCircle,
 } from "lucide-react";
 import { domainsAPI } from "../lib/api/domains";
 import { statsAPI } from "../lib/api/stats";
@@ -34,6 +41,7 @@ const Dashboard = () => {
 	const [error, setError] = useState(null);
 	const [showAddDomain, setShowAddDomain] = useState(false);
 	const [recentActivity, setRecentActivity] = useState([]);
+	const [domainFilter, setDomainFilter] = useState("recent"); // "recent" or "active"
 
 	// Get user display name
 	const getUserDisplayName = () => {
@@ -118,6 +126,21 @@ const Dashboard = () => {
 		];
 	};
 
+	// Get filtered domains for display
+	const getFilteredDomains = () => {
+		let filteredDomains = [...domains];
+		
+		if (domainFilter === "recent") {
+			// Sort by creation date (most recent first)
+			filteredDomains.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+		} else if (domainFilter === "active") {
+			// Sort by email count (highest first)
+			filteredDomains.sort((a, b) => b.emails - a.emails);
+		}
+		
+		// Return only first 3 domains
+		return filteredDomains.slice(0, 3);
+	};
 	const loadRecentActivity = async () => {
 		try {
 			const logs = await activityAPI.getRecentActivity();
@@ -172,6 +195,7 @@ const Dashboard = () => {
 						tag: Array.isArray(domain.tags)
 							? domain.tags[0]
 							: domain.tag || "untagged",
+						createdAt: domain.created_at || new Date().toISOString(),
 				  }))
 				: [];
 
@@ -224,6 +248,7 @@ const Dashboard = () => {
 				lastCheck: "Just added",
 				emails: 0,
 				tag: domainData.tag || "new",
+				createdAt: new Date().toISOString(),
 			};
 
 			setDomains((prev) => [...prev, transformedDomain]);
@@ -343,6 +368,14 @@ const Dashboard = () => {
 	const doughnutOptions = {
 		responsive: true,
 		maintainAspectRatio: false,
+		layout: {
+			padding: {
+				top: 10,
+				bottom: 10,
+				left: 10,
+				right: 10
+			}
+		},
 		plugins: {
 			legend: {
 				position: "bottom",
@@ -350,6 +383,8 @@ const Dashboard = () => {
 					padding: 20,
 					usePointStyle: true,
 					font: {
+					boxWidth: 12,
+					boxHeight: 12,
 						size: 12,
 					},
 				},
@@ -399,8 +434,8 @@ const Dashboard = () => {
 					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.6 }}
-					className="mb-6">
-					<div className="bg-gradient-primary rounded-xl p-4 text-white max-w-1xl">
+					className="mb-8">
+					<div className="bg-gradient-primary rounded-xl p-6 text-white max-w-4xl">
 						<div className="flex items-center justify-between">
 							<div>
 								<h1 className="text-xl md:text-2xl font-bold mb-1">
@@ -447,7 +482,6 @@ const Dashboard = () => {
 									className={`flex items-center justify-center w-12 h-12 ${stat.bgColor} rounded-lg`}>
 									<stat.icon className={`w-6 h-6 ${stat.color}`} />
 								</div>
-								<TrendingUp className="w-4 h-4 text-green-500" />
 							</div>
 							<div>
 								<p className="text-sm font-medium text-gray-600 mb-1">
@@ -474,19 +508,33 @@ const Dashboard = () => {
 								<h2 className="text-xl font-bold text-gray-900">
 									Domain Protection Status
 								</h2>
-								<button
-									onClick={() => setShowAddDomain(true)}
-									className="btn-primary">
-									<Plus className="w-4 h-4 mr-2" />
-									Add Domain
-								</button>
+								<div className="flex items-center space-x-4">
+									{/* Domain Filter Dropdown */}
+									<div className="relative">
+										<select
+											value={domainFilter}
+											onChange={(e) => setDomainFilter(e.target.value)}
+											className="appearance-none bg-white border border-gray-300 rounded-lg px-3 py-2 pr-8 text-sm font-medium text-gray-700 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+										>
+											<option value="recent">Most Recent</option>
+											<option value="active">Most Active</option>
+										</select>
+										<ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+									</div>
+									
+										onClick={() => setShowAddDomain(true)}
+										className="btn-primary">
+										<Plus className="w-4 h-4 mr-2" />
+										Add Domain
+									</button>
+								</div>
 							</div>
 
-							<div className="space-y-4">
-								{domains.map((domain) => (
+							<div className="space-y-4 flex-grow">
+								{getFilteredDomains().map((domain) => (
 									<div
 										key={domain.id}
-										className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+										className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow min-h-[120px] flex flex-col justify-between">
 										<div className="flex items-center justify-between mb-3">
 											<div className="flex items-center space-x-3">
 												{getStatusIcon(domain.status)}
@@ -543,6 +591,30 @@ const Dashboard = () => {
 										</div>
 									</div>
 								))}
+								
+								{/* Show message if fewer than 3 domains */}
+								{getFilteredDomains().length === 0 && (
+									<div className="text-center py-12 border-2 border-dashed border-gray-300 rounded-lg">
+										<Globe className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+										<h3 className="text-lg font-semibold text-gray-900 mb-2">No domains yet</h3>
+										<p className="text-gray-600 mb-4">Add your first domain to start monitoring email security.</p>
+									</div>
+								)}
+								
+								{getFilteredDomains().length > 0 && getFilteredDomains().length < 3 && (
+									<div className="text-center py-8 border border-gray-200 rounded-lg bg-gray-50">
+										<p className="text-gray-600">
+											Showing {getFilteredDomains().length} of {domains.length} domains
+										</p>
+										{domains.length > 3 && (
+											<Link
+												to="/dashboard/domains"
+												className="text-primary-600 hover:text-primary-700 font-medium text-sm mt-2 inline-block">
+												View all domains →
+											</Link>
+										)}
+									</div>
+								)}
 							</div>
 						</div>
 					</motion.div>
@@ -553,18 +625,20 @@ const Dashboard = () => {
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.6, delay: 0.3 }}
 						className="lg:col-span-1">
-						<div className="card h-full">
+						<div className="card h-full flex flex-col">
 							<h2 className="text-xl font-bold text-gray-900 mb-4">
 								DMARC Policy Distribution
 							</h2>
-							<div className="h-64">
+							<div className="flex-grow flex items-center justify-center">
+								<div className="w-full h-64">
+								</div>
 								<Doughnut data={doughnutData} options={doughnutOptions} />
 							</div>
-							<div className="mt-4 text-sm text-gray-600">
+							<div className="mt-2 text-sm text-gray-600">
 								<p className="mb-2">
 									Policy breakdown across {domains.length} domains:
 								</p>
-								<div className="space-y-1">
+								<div className="space-y-1 text-xs">
 									<div className="flex justify-between">
 										<span className="flex items-center">
 											<div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
@@ -655,6 +729,34 @@ const Dashboard = () => {
 										</div>
 									</div>
 								</Link>
+								<button className="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors group">
+									<div className="flex items-center">
+										<Search className="w-5 h-5 text-primary-600 mr-3 group-hover:scale-110 transition-transform" />
+										<div>
+											<p className="font-medium text-gray-900">
+												Verify DNS Records
+											</p>
+											<p className="text-sm text-gray-500">
+												Check domain configuration
+											</p>
+										</div>
+									</div>
+								</button>
+								<Link
+									to="/dashboard/reports"
+									className="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors group block">
+									<div className="flex items-center">
+										<Activity className="w-5 h-5 text-primary-600 mr-3 group-hover:scale-110 transition-transform" />
+										<div>
+											<p className="font-medium text-gray-900">
+												View Compliance Trends
+											</p>
+											<p className="text-sm text-gray-500">
+												Track security progress
+											</p>
+										</div>
+									</div>
+								</Link>
 							</div>
 						</div>
 					</motion.div>
@@ -665,11 +767,21 @@ const Dashboard = () => {
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.6, delay: 0.5 }}
 						className="order-2">
-						<div className="card h-full">
+						<div className="card h-full flex flex-col">
 							<h2 className="text-xl font-bold text-gray-900 mb-4">
 								Recent Activity
 							</h2>
-							<RecentActivity logs={recentActivity} />
+							<div className="flex-grow">
+								<RecentActivity logs={recentActivity.slice(0, 5)} />
+							</div>
+							<div className="mt-4 pt-4 border-t border-gray-200">
+								<Link
+									to="/dashboard/audit-logs"
+									className="w-full btn-outline text-center flex items-center justify-center">
+									<ExternalLink className="w-4 h-4 mr-2" />
+									View More
+								</Link>
+							</div>
 						</div>
 					</motion.div>
 
@@ -680,15 +792,36 @@ const Dashboard = () => {
 						transition={{ duration: 0.6, delay: 0.6 }}
 						className="order-3">
 						<div className="card h-full flex flex-col">
-							<div className="flex items-center mb-4">
-								<Mail className="w-6 h-6 text-primary-600 mr-3" />
+							<div className="flex items-center mb-6">
+								<div className="flex items-center justify-center w-12 h-12 bg-primary-100 rounded-lg mr-4">
+									<HelpCircle className="w-6 h-6 text-primary-600" />
+								</div>
 								<h2 className="text-xl font-bold text-gray-900">Need Help?</h2>
 							</div>
 							
 							<div className="flex-grow">
 								<p className="text-gray-600 mb-6 leading-relaxed">
-									If you need support or have any questions, feel free to reach out to our team.
+									Our support team is here to help you with any questions about email security, DMARC configuration, or account management.
 								</p>
+								
+								{/* Help Topics */}
+								<div className="mb-6">
+									<h4 className="font-medium text-gray-900 mb-3">Popular Help Topics:</h4>
+									<ul className="space-y-2 text-sm text-gray-600">
+										<li className="flex items-center">
+											<BookOpen className="w-3 h-3 mr-2 text-primary-500" />
+											DMARC Setup Guide
+										</li>
+										<li className="flex items-center">
+											<MessageCircle className="w-3 h-3 mr-2 text-primary-500" />
+											DNS Configuration Help
+										</li>
+										<li className="flex items-center">
+											<Shield className="w-3 h-3 mr-2 text-primary-500" />
+											Security Best Practices
+										</li>
+									</ul>
+								</div>
 								
 								<div className="mb-6">
 									<div className="flex items-center text-gray-700 mb-2">
