@@ -266,7 +266,7 @@ const DomainDetail = () => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
-      className="min-h-screen bg-gray-50 pt-20"
+      className="min-h-screen bg-gray-50 pt-3"
     >
       <div className="container-custom py-8">
         {/* Header */}

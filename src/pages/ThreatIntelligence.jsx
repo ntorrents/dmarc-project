@@ -36,10 +36,10 @@ const ThreatIntelligence = () => {
 
 		try {
 			console.log("Loading threat intelligence from API...");
-			
+
 			// TODO: Implement actual API calls when backend endpoints are ready
 			// For now, we'll simulate loading and show a coming soon message
-			
+
 			setTimeout(() => {
 				setLoading(false);
 			}, 1000);
@@ -170,7 +170,7 @@ const ThreatIntelligence = () => {
 			animate={{ opacity: 1 }}
 			exit={{ opacity: 0 }}
 			transition={{ duration: 0.3 }}
-			className="min-h-screen bg-gray-50 pt-20">
+			className="min-h-screen bg-gray-50 pt-3">
 			<div className="container-custom py-6">
 				{/* Header */}
 				<motion.div
@@ -347,11 +347,15 @@ const ThreatIntelligence = () => {
 							Advanced Threat Intelligence Coming Soon
 						</h3>
 						<p className="text-gray-600 mb-6">
-							We're developing comprehensive threat intelligence features that will provide real-time monitoring and analysis of email security threats.
+							We're developing comprehensive threat intelligence features that
+							will provide real-time monitoring and analysis of email security
+							threats.
 						</p>
 						<div className="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-md mx-auto">
 							<p className="text-blue-800 text-sm">
-								<strong>What's coming:</strong> Real-time threat detection, IP reputation analysis, attack pattern recognition, and automated response capabilities.
+								<strong>What's coming:</strong> Real-time threat detection, IP
+								reputation analysis, attack pattern recognition, and automated
+								response capabilities.
 							</p>
 						</div>
 					</div>

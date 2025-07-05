@@ -100,8 +100,8 @@ const Dashboard = () => {
 			},
 			{
 				title: "DMARC Compliance",
-				value: dashboardStats.dmarc_compliance 
-					? `${Math.round(dashboardStats.dmarc_compliance)}%` 
+				value: dashboardStats.dmarc_compliance
+					? `${Math.round(dashboardStats.dmarc_compliance)}%`
 					: "0%",
 				icon: Shield,
 				color: "text-primary-600",
@@ -391,7 +391,7 @@ const Dashboard = () => {
 			animate={{ opacity: 1 }}
 			exit={{ opacity: 0 }}
 			transition={{ duration: 0.3 }}
-			className="min-h-screen bg-gray-50 pt-20">
+			className="min-h-screen bg-gray-50 pt-3">
 			<div className="container-custom py-6">
 				{/* Welcome Header */}
 				<motion.div
@@ -399,7 +399,7 @@ const Dashboard = () => {
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.6 }}
 					className="mb-6">
-					<div className="bg-gradient-primary rounded-xl p-4 text-white max-w-4xl">
+					<div className="bg-gradient-primary rounded-xl p-4 text-white max-w-1xl">
 						<div className="flex items-center justify-between">
 							<div>
 								<h1 className="text-xl md:text-2xl font-bold mb-1">
@@ -533,10 +533,9 @@ const Dashboard = () => {
 											<span className="text-gray-500">
 												Last check: {domain.lastCheck}
 											</span>
-											<Link 
+											<Link
 												to={`/dashboard/domains/${domain.id}`}
-												className="text-primary-600 hover:text-primary-700 font-medium"
-											>
+												className="text-primary-600 hover:text-primary-700 font-medium">
 												View Details →
 											</Link>
 										</div>
