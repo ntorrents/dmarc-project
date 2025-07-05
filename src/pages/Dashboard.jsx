@@ -11,6 +11,7 @@ import {
 	AlertTriangle,
 	XCircle,
 	TrendingUp,
+	Mail,
 } from "lucide-react";
 import { domainsAPI } from "../lib/api/domains";
 import { statsAPI } from "../lib/api/stats";
